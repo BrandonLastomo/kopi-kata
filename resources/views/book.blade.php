@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking | Kopi & Kata</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="header">
+        <div id="menu-btn" class="fas fa-bars"></div>
+        <a href="#" class="logo">Kopi & Kata</a>
+        <nav class="navbar">
+            <a href="index.php">home</a>
+            <a href="index.php#about">about</a>
+            <a href="index.php#menu">menu</a>
+            <a href="index.php#review">review</a>
+            <a href="book.php">book</a>
+        </nav>
+        <div class="user-info">
+            <a href="#" class="btn">Hi, {{ auth()->user()->name }} </a>
+            <a href="{{ route('logout') }}" class="btn">logout</a>
+        </div>
+    </header>
+
+    <section class="book" id="book">
+        <h1 class="heading">booking <span>reserve a table</span></h1>
+
+        <img src="{{ asset('src/images/menu-1.png') }}" alt="" class="coffee-decoration coffee-1">
+        <img src="{{ asset('src/images/menu-3.png') }}" alt="" class="coffee-decoration coffee-2">
+
+        @if (session('success'))
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i> {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            </div>
+        @endif
+        @if ($errors->any())
+             <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="step-indicator">
+            <div class="step">
+                <div class="step-circle active" id="step1">1</div>
+                <div class="step-title">Pilih Tanggal & Waktu</div>
+            </div>
+            <div class="step">
+                <div class="step-circle {{ request()->has('check_availability') ? 'active' : '' }}" id="step2">2</div>
+                <div class="step-title">Pilih Meja</div>
+            </div>
+            <div class="step">
+                <div class="step-circle" id="step3">3</div>
+                <div class="step-title">Isi Informasi</div>
+            </div>
+        </div>
+
+        <div id="timeSelectionForm" class="time-selection-form">
+            <h3>Pilih Tanggal dan Waktu Kunjungan Anda</h3>
+            <form action="{{ route('book.index') }}" method="GET">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date"><i class="fas fa-calendar-alt"></i> Tanggal</label>
+                        <input type="date" id="date" name="date" class="box" value="{{ $selectedDate }}"
+                            min="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="start_time"><i class="fas fa-clock"></i> Waktu Mulai</label>
+                        <select id="start_time" name="start_time" class="box" required>
+                            <option value="10:00" @selected($selectedStartTime == '10:00')>10:00</option>
+                            <option value="12:00" @selected($selectedStartTime == '12:00')>12:00</option>
+                            <option value="14:00" @selected($selectedStartTime == '14:00')>14:00</option>
+                            <option value="16:00" @selected($selectedStartTime == '16:00')>16:00</option>
+                            <option value="18:00" @selected($selectedStartTime == '18:00')>18:00</option>
+                            <option value="20:00" @selected($selectedStartTime == '20:00')>20:00</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_time"><i class="fas fa-clock"></i> Waktu Selesai</label>
+                        <select id="end_time" name="end_time" class="box" required>
+                            <option value="12:00" @selected($selectedEndTime == '12:00')>12:00</option>
+                            <option value="14:00" @selected($selectedEndTime == '14:00')>14:00</option>
+                            <option value="16:00" @selected($selectedEndTime == '16:00')>16:00</option>
+                            <option value="18:00" @selected($selectedEndTime == '18:00')>18:00</option>
+                            <option value="20:00" @selected($selectedEndTime == '20:00')>20:00</option>
+                            <option value="22:00" @selected($selectedEndTime == '22:00')>22:00</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" name="check_availability" value="1">
+                <button type="submit" class="btn">Cek Ketersediaan Meja</button>
+            </form>
+        </div>
+
+        @if (request()->has('check_availability'))
+            <div id="tableSelectionSection">
+                <h3 class="section-title">Pilih Meja yang Tersedia</h3>
+                <div class="booking-status">
+                    <div class="status-item">
+                        <div class="status-indicator status-available"></div>
+                        <span>Available ({{ $availableTables }})</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator status-booked"></div>
+                        <span>Booked ({{ $bookedTableNumbers->count() }})</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    @for ($i = 1; $i <= $totalTables; $i++)
+                        @php
+                            // Gunakan method 'contains' pada koleksi
+                            $isBooked = $bookedTableNumbers->contains($i);
+                            $tableClass = $isBooked ? 'booked' : 'available';
+                        @endphp
+                        <div class="table-item {{ $tableClass }}" data-table="{{ $i }}">
+                            <div class="table-number">{{ $i }}</div>
+                            <div>{{ $isBooked ? 'Booked' : 'Available' }}</div>
+                        </div>
+                    @endfor
+                </div>
+
+                <div id="bookingForm" class="hidden">
+                    <h3 class="section-title">Isi Informasi Booking</h3>
+                    <form action="{{ route('book.store') }}" method="POST">
+                        @csrf
+                        <input type="text" name="name" placeholder="Your Name" class="box" value="{{ old('name', Auth::user()->name) }}" required>
+                        <input type="email" name="email" placeholder="Your Email" class="box" value="{{ old('email', Auth::user()->email) }}" required>
+                        <input type="text" name="phone" placeholder="Phone Number" class="box" value="{{ old('phone') }}">
+                        <textarea name="message" placeholder="Special requests or message" class="box" cols="30" rows="10">{{ old('message') }}</textarea>
+
+                        <input type="hidden" name="booking_date" value="{{ $selectedDate }}">
+                        <input type="hidden" name="start_time" value="{{ $selectedStartTime }}">
+                        <input type="hidden" name="end_time" value="{{ $selectedEndTime }}">
+                        <input type="hidden" name="table_number" id="selected_table" value="{{ old('table_number') }}">
+
+                        <input type="submit" id="submitBtn" value="Book Your Table Now" class="btn">
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        <div class="booking-details">
+            <h2>Recent Bookings</h2>
+            <div class="booking-list">
+                @forelse ($bookings as $booking)
+                    <div class="booking-item">
+                        <p><strong><i class="fas fa-user"></i> Name:</strong> {{ $booking->name }}</p>
+                        <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ $booking->email }}</p>
+                        <p><strong><i class="fas fa-phone"></i> Phone:</strong> {{ $booking->phone }}</p>
+                        <p><strong><i class="fas fa-calendar-day"></i> Date:</strong>
+                            {{ $booking->booking_date->format('d M Y') }}</p>
+                        <p><strong><i class="fas fa-clock"></i> Time:</strong>
+                            {{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} -
+                            {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}
+                        </p>
+                        <p><strong><i class="fas fa-chair"></i> Table:</strong> #{{ $booking->table_number }}</p>
+                        <p><strong><i class="fas fa-calendar-alt"></i> Booked on:</strong>
+                            {{ $booking->created_at->format('d M Y H:i') }}</p>
+                        @if (!empty($booking->message))
+                            <p><strong><i class="fas fa-comment"></i> Message:</strong> {{ $booking->message }}</p>
+                        @endif
+
+                        <form action="{{ route('book.destroy', $booking->id) }}" method="POST" 
+                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus booking ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="delete-btn">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </form>
+                    </div>
+                @empty
+                    <p style="color: white; text-align: center; font-size: 1.8rem;">Belum ada booking. Jadilah yang pertama!</p>
+                @endforelse
+            </div>
+        </div>
+    </section>  
+
+@push('scripts')
+    {{-- Salin semua JS dari file lama ke sini --}}
+    <script>
+        // Script untuk validasi waktu (sama seperti file asli)
+        document.getElementById('start_time').addEventListener('change', function () {
+            const startTime = this.value;
+            const endTimeSelect = document.getElementById('end_time');
+            const startHour = parseInt(startTime.split(':')[0]);
+            let minEndHour = startHour + 2;
+
+            Array.from(endTimeSelect.options).forEach(option => {
+                const endHour = parseInt(option.value.split(':')[0]);
+                option.disabled = endHour <= startHour;
+            });
+
+            if (parseInt(endTimeSelect.value.split(':')[0]) <= startHour) {
+                for (let i = 0; i < endTimeSelect.options.length; i++) {
+                    const endHour = parseInt(endTimeSelect.options[i].value.split(':')[0]);
+                    if (endHour >= minEndHour && !endTimeSelect.options[i].disabled) {
+                        endTimeSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Script untuk menangani klik pada meja
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (request()->has('check_availability'))
+                // Tambahkan event listener ke meja yang tersedia
+                document.querySelectorAll('.table-item.available').forEach(table => {
+                    table.addEventListener('click', function () {
+                        // Jangan lakukan apapun jika meja tidak tersedia
+                        if (this.classList.contains('booked')) return;
+
+                        const tableNumber = this.getAttribute('data-table');
+
+                        document.querySelectorAll('.table-item.available').forEach(t => {
+                            t.style.transform = 'scale(1)';
+                            t.style.boxShadow = 'none';
+                        });
+
+                        this.style.transform = 'scale(1.1)';
+                        this.style.boxShadow = '0 0 20px rgba(244, 185, 90, 0.7)';
+                        document.getElementById('step3').classList.add('active');
+                        document.getElementById('bookingForm').classList.remove('hidden');
+                        document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth' });
+                        document.getElementById('selected_table').value = tableNumber;
+                        document.getElementById('submitBtn').value = `Book Table ${tableNumber} on {{ $selectedDate }}`;
+                    });
+                });
+
+                // Jika ada old input (setelah validasi gagal), tampilkan form
+                const oldTable = document.getElementById('selected_table').value;
+                if(oldTable) {
+                    document.getElementById('bookingForm').classList.remove('hidden');
+                    document.getElementById('step3').classList.add('active');
+                    const selectedTableEl = document.querySelector(`.table-item[data-table="${oldTable}"]`);
+                    if(selectedTableEl && selectedTableEl.classList.contains('available')) {
+                         selectedTableEl.style.transform = 'scale(1.1)';
+                         selectedTableEl.style.boxShadow = '0 0 20px rgba(244, 185, 90, 0.7)';
+                    }
+                }
+            @endif
+        });
+    </script>
+
+</body>
+
+</html>

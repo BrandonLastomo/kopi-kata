@@ -343,7 +343,7 @@ $totalTables = 10;
                 </div>
                 <div class="nav-item active">
                     <i class="fas fa-calendar-alt"></i>
-                    <a href="admin_bookings.php">Kelola Booking</a>
+                    <a href="bookings.php">Kelola Booking</a>
                 </div>
                 <div class="nav-item">
                     <i class="fas fa-chair"></i>

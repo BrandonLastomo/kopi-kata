@@ -16,11 +16,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@gmail.com',
-            'password' => bcrypt('11111111'),
+        $this->call([
+            UserSeeder::class,    // Mengisi data admin dan user
+            TableSeeder::class,   // Mengisi data 10 meja
+            BookingSeeder::class, // Mengisi data booking history
         ]);
     }
 }

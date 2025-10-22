@@ -31,12 +31,16 @@
             <a href="#about">about</a>
             <a href="#menu">menu</a>
             <a href="#review">review</a>
-            <a href="book.php">book</a>
+            <a href="{{ route('book.index') }}">book</a>
         </nav>
 
         <div class="user-info">
-            <a href="#" class="btn">Hi, {{ auth()->user()->name }} </a>
-            <a href="logout.php" class="btn">logout</a>
+            <a href="#" class="btn">{{ auth()->check() ? "Hi, ". auth()->user()->name : "Welcome!" }}</a>
+            @if (auth()->check())
+                <a href="{{ route('logout') }}" class="btn">Logout</a>
+            @else
+                <a href="{{ route('login') }}" class="btn">Login</a>
+            @endif
         </div>
     </header>
 
@@ -222,7 +226,7 @@
     <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
 
     <!-- Custom JS File Link  -->
-    <script src="script.js"></script>
+    <script src="{{ asset('assets/js/script.js') }}"></script>
 
 </body>
 
