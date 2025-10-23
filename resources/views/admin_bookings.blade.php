@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 </head>
 
-<body class="dashboard-body">
+<body>
     <div class="admin-container">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -35,9 +35,9 @@
                     <i class="fas fa-users"></i>
                     <a href="{{ route('users.index') }}">Kelola Pengguna</a>
                 </div>
-                {{-- <div class="nav-item {{ request()->routeIs('settings') ? 'active' : '' }}">
+                {{-- <div class="nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i>
-                    <a href="{{ route('settings') }}">Pengaturan</a>
+                    <a href="{{ route('admin.settings') }}">Pengaturan</a>
                 </div> --}}
             </nav>
         </aside>

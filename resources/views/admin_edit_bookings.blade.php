@@ -1,106 +1,3 @@
-<?php
-require_once 'admin_auth_check.php';
-require_once 'config.php';
-
-$error = '';
-$success = '';
-$booking = null;
-
-// Cek apakah ada ID yang diterima
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header('Location: admin_dashboard.php');
-    exit;
-}
-
-$booking_id = $_GET['id'];
-
-// Ambil data booking berdasarkan ID
-try {
-    $stmt = $pdo->prepare("SELECT * FROM bookings WHERE id = ?");
-    $stmt->execute([$booking_id]);
-    $booking = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$booking) {
-        header('Location: admin_dashboard.php');
-        exit;
-    }
-} catch (PDOException $e) {
-    $error = 'Error: ' . $e->getMessage();
-}
-
-// Proses form update jika disubmit
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    try {
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
-        $table_number = $_POST['table_number'];
-        $booking_date = $_POST['booking_date'];
-        $start_time = $_POST['start_time'];
-        $end_time = $_POST['end_time'];
-        $message = $_POST['message'];
-
-        // Validasi bahwa meja masih tersedia (skip jika meja tidak berubah)
-        if ($table_number != $booking['table_number']) {
-            $sql = "SELECT COUNT(*) FROM bookings 
-                    WHERE booking_date = ? AND table_number = ? AND id != ?
-                    AND ((start_time <= ? AND end_time > ?) 
-                    OR (start_time < ? AND end_time >= ?) 
-                    OR (start_time >= ? AND start_time < ?))";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                $booking_date,
-                $table_number,
-                $booking_id,
-                $end_time,
-                $start_time,
-                $end_time,
-                $start_time,
-                $start_time,
-                $end_time
-            ]);
-
-            $count = $stmt->fetchColumn();
-
-            if ($count > 0) {
-                $error = "Maaf, meja tersebut sudah dibooking pada waktu yang dipilih.";
-            }
-        }
-
-        // Jika tidak ada error, update booking
-        if (empty($error)) {
-            $sql = "UPDATE bookings SET name = ?, email = ?, phone = ?, table_number = ?, 
-                    booking_date = ?, start_time = ?, end_time = ?, message = ? WHERE id = ?";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                $name,
-                $email,
-                $phone,
-                $table_number,
-                $booking_date,
-                $start_time,
-                $end_time,
-                $message,
-                $booking_id
-            ]);
-
-            $success = "Booking berhasil diperbarui!";
-
-            // Refresh data booking
-            $stmt = $pdo->prepare("SELECT * FROM bookings WHERE id = ?");
-            $stmt->execute([$booking_id]);
-            $booking = $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-    } catch (PDOException $e) {
-        $error = "Error updating booking: " . $e->getMessage();
-    }
-}
-
-// Total meja yang tersedia
-$totalTables = 10;
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -109,8 +6,9 @@ $totalTables = 10;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Booking | Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
+    <link rel="stylesheet" href="asset('assets/css/style.css')">
+
+        <style>
         :root {
             --primary: #4a2c2a;
             --secondary: #f4b95a;
@@ -326,6 +224,7 @@ $totalTables = 10;
             background-color: #5a6268 !important;
         }
     </style>
+
 </head>
 
 <body>
@@ -337,26 +236,27 @@ $totalTables = 10;
                 <p>Admin Panel</p>
             </div>
             <nav class="sidebar-nav">
-                <div class="nav-item">
+                 {{-- Tautan diubah ke route() --}}
+                <div class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
-                    <a href="admin_dashboard.php">Dashboard</a>
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
                 </div>
-                <div class="nav-item active">
+                <div class="nav-item {{ request()->routeIs('bookings.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
-                    <a href="bookings.php">Kelola Booking</a>
+                    <a href="{{ route('bookings.index') }}">Kelola Booking</a>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item {{ request()->routeIs('tables.*') ? 'active' : '' }}">
                     <i class="fas fa-chair"></i>
-                    <a href="admin_tables.php">Kelola Meja</a>
+                    <a href="{{ route('tables.index') }}">Kelola Meja</a>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
                     <i class="fas fa-users"></i>
-                    <a href="admin_users.php">Kelola Pengguna</a>
+                    <a href="{{ route('users.index') }}">Kelola Pengguna</a>
                 </div>
-                <div class="nav-item">
+                {{-- <div class="nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i>
-                    <a href="admin_settings.php">Pengaturan</a>
-                </div>
+                    <a href="{{ route('admin.settings') }}">Pengaturan</a>
+                </div> --}}
             </nav>
         </aside>
 
