@@ -14,18 +14,17 @@
         {{ session('success') }}
     </div>
   @endif
-  <div class="form-container">
-    <div class="back-btn" onclick="window.history.back()">&#8592;</div>
-    <h2>Kopi & Kata</h2>
+  <div class="sign-form-container">
+    <h1 class="heading">Sign In</h1>
     <form action="{{ route('login.post') }}" method="POST">
       @csrf
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <label for="email">email</label>
+      <input type="email" name="email" id="email" placeholder="Email" required />
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" placeholder="Password" required />
       <button type="submit">Sign in</button>
     </form>
-    <div class="form-footer">
-      <p>Don't have an account? <a href="{{ route('register') }}">create account</a></p>
-    </div>
+    <p class="form-footer">Don't have an account? <a href="{{ route('register') }}">Create account</a></p>
   </div>
 </body>
 

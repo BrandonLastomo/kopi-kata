@@ -9,20 +9,22 @@
 </head>
 
 <body>
-  <div class="form-container">
-    <div class="back-btn" onclick="window.history.back()">&#8592;</div>
-    <h2>Kopi & Kata</h2>
+  <div class="sign-form-container">
+    <h1 class="heading">Create Your Account</h1>
     <form action="{{ route('register.post') }}" method="POST">
       @csrf
-      <input type="text" name="name" placeholder="Username" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" placeholder="Username" required />
+      <label for="email">Email Address</label>
+      <input type="email" name="email" id="email" placeholder="Email" required />
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" placeholder="Password" required />
       {{-- <input type="password" name="confirm_password" placeholder="Confirm Password" required /> --}}
-      <button type="submit">Sign up</button>
+      <div class="btn-container">
+        <button type="submit">Register</button>
+      </div>
     </form>
-    <div class="form-footer">
-      <p>Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
-    </div>
+    <p class="form-footer">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
   </div>
 </body>
 

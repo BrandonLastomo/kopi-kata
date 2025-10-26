@@ -323,6 +323,85 @@ nav a {
 }
 
 /* Container form */
+
+.sign-form-container {
+    height: 100vh;
+    padding-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sign-form-container .heading {
+    text-align: center;
+    width: 100%;
+    font-size: var(--textXBg);
+    font: bold;
+    color: var(--primary);
+    letter-spacing: -4px;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.sign-form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sign-form-container form label {
+    font-size: var(--textSm);
+    font-weight: 500;
+    width: 10vw;
+    background-color: var(--primary);
+    color: var(--secondary);
+}
+
+.sign-form-container form .btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sign-form-container form input {
+    width: 32vw;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: var(--textSm);
+    outline: none;
+    transition: 0.3s;
+}
+
+.sign-form-container form input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.sign-form-container form button {
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    background-color: var(--secondary);
+    border: none;
+    border-radius: 10rem;
+    color: var(--black);
+    font-size: var(--textSm);
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 1rem;
+}
+
+.sign-form-container .form-footer {
+    font-size: var(--textSm);
+    color: var(--primary);
+}
+
+.sign-form-container .form-footer a {
+    background-color: var(--secondary);
+    color: var(--black);
+}
 .form-container {
     background: white;
     padding: 40px 50px;
