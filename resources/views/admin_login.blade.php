@@ -10,15 +10,18 @@
 </head>
 
 <body>
-    <div class="coffee-bg"></div>
-    <div class="admin-login-container">
-        <h2>Admin Login</h2>
+    <div class="sign-form-container">
+        <h1 class="heading">Admin Sign In</h1>
 
         <form action="{{ route('login.admin.post') }}" method="POST">
             @csrf
-            <input type="email" name="email" placeholder="Email" class="box" required>
-            <input type="password" name="password" placeholder="Password" class="box" required>
-            <button type="submit" class="btn">Login</button>
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" placeholder="Username" required />
+      <label for="email">Email Address</label>
+      <input type="email" name="email" id="email" placeholder="Email" required />
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" placeholder="Password" required />
+            <button type="submit">Sign In</button>
         </form>
     </div>
 </body>

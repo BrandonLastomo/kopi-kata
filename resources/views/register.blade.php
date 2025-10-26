@@ -20,9 +20,7 @@
       <label for="password">Password</label>
       <input type="password" name="password" id="password" placeholder="Password" required />
       {{-- <input type="password" name="confirm_password" placeholder="Confirm Password" required /> --}}
-      <div class="btn-container">
         <button type="submit">Register</button>
-      </div>
     </form>
     <p class="form-footer">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
   </div>

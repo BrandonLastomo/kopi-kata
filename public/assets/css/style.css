@@ -359,8 +359,6 @@ nav a {
 
 .sign-form-container form .btn-container {
     width: 100%;
-    display: flex;
-    justify-content: flex-end;
 }
 
 .sign-form-container form input {
