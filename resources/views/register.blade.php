@@ -10,7 +10,7 @@
 
 <body>
   <div class="form-container">
-    <div class="back-btn" onclick="location.href='index.html'">&#8592;</div>
+    <div class="back-btn" onclick="window.history.back()">&#8592;</div>
     <h2>Kopi & Kata</h2>
     <form action="{{ route('register.post') }}" method="POST">
       @csrf

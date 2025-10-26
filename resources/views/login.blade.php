@@ -15,7 +15,7 @@
     </div>
   @endif
   <div class="form-container">
-    <div class="back-btn" onclick="history.back()">&#8592;</div>
+    <div class="back-btn" onclick="window.history.back()">&#8592;</div>
     <h2>Kopi & Kata</h2>
     <form action="{{ route('login.post') }}" method="POST">
       @csrf
