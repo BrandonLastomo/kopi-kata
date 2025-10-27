@@ -61,7 +61,7 @@ header {
     margin-top: 2rem;
 }
 
-nav .user-nav {
+.user-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
