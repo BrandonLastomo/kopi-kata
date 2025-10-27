@@ -42,10 +42,9 @@
                 <h1>Dashboard</h1>
                 <div class="admin-info">
                     <span>Selamat datang, {{ $admin_name ?? 'Admin' }}</span>
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                        @csrf
-                        <a href="{{ route('logout') }}" class="logout-btn">Logout</a>
-                    </form>
+                        <a href="{{ route('logout') }}" class="logout-btn">
+                            Logout
+                        </a>
                 </div>
             </div>
 

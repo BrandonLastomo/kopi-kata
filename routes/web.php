@@ -43,8 +43,6 @@ Route::middleware('auth')->group(function () {
 
     // Hapus booking (delete_booking.php)
     Route::delete('book/{booking}', [BookingController::class, 'destroy'])->name('book.destroy');
-    // Logout
-    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
     
     // Dashboard (admin_dashboard.php)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -57,6 +55,7 @@ Route::middleware('auth')->group(function () {
 
     // Kelola Users (admin_users.php)
     Route::resource('users', AdminUserController::class);
+    
     // Logout
     Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 });

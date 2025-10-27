@@ -88,7 +88,7 @@ class TableController extends Controller
         ]);
 
         $table->update($data);
-        return redirect()->route('admin_tables')->with('success', 'Data meja berhasil diperbarui');
+        return redirect()->route('tables.index')->with('success', 'Data meja berhasil diperbarui');
     }
 
     public function destroy(Table $table)

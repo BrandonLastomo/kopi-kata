@@ -47,13 +47,10 @@
                     {{-- $admin_name dari middleware --}}
                     <span>Selamat datang, {{ $admin_name ?? 'Admin' }}</span>
                      {{-- Tombol Logout --}}
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                        @csrf
-                        <a href="{{ route('logout') }}" class="logout-btn"
-                           onclick="event.preventDefault(); this.closest('form').submit();">
+                     
+                        <a href="{{ route('logout') }}" class="logout-btn">
                             Logout
                         </a>
-                    </form>
                 </div>
             </div>
 
