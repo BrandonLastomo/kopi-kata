@@ -1,6 +1,6 @@
 <!-- HEADER -->
 <header>
-    <nav>
+    <nav class="user-nav">
         <p class="logo">Kopi&Kata</p>
         <div class="pageLinks">
             <a href="{{ route('home') }}/#home">home</a>
