@@ -18,7 +18,7 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         // Mengambil semua booking untuk list "Recent Bookings"
-        $bookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
+        $bookings = Booking::with('user')->orderBy('created_at', 'desc')->get();
         $totalTables = Table::count();
 
         $selectedDate = $request->input('date', Carbon::today()->toDateString());

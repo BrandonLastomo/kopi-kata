@@ -11,6 +11,15 @@
 <body>
   <div class="sign-form-container">
     <h1 class="heading">Create Your Account</h1>
+    @if ($errors->has('email'))
+        <div id="error-message">
+            <strong>{{ $errors->first('email') }}</strong>
+        </div>
+    @elseif ($errors->has('password'))
+        <div id="error-message">
+            <strong>{{ $errors->first('password') }}</strong>
+        </div>
+    @endif
     <form action="{{ route('register.post') }}" method="POST">
       @csrf
       <label for="name">Name</label>
@@ -24,6 +33,7 @@
     </form>
     <p class="form-footer">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
   </div>
+  <script src="{{ asset('assets/js/script.js') }}"></script>
 </body>
 
 </html>

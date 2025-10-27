@@ -151,15 +151,16 @@
                         @if (!empty($booking->message))
                             <p><strong><i class="fas fa-comment"></i> Message:</strong> {{ $booking->message }}</p>
                         @endif
-
-                        <form action="{{ route('book.destroy', $booking->id) }}" class="delete-book" method="POST" 
-                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus booking ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="form-btn">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </form>
+                        @if (auth()->user()->name == $booking->user->name)
+                            <form action="{{ route('book.destroy', $booking->id) }}" class="delete-book" method="POST" 
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus booking ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="form-btn">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 @empty
                     <p class="heading">Belum ada booking. Jadilah yang pertama!</p>

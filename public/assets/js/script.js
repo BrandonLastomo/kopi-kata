@@ -1,6 +1,5 @@
-let menu = document.querySelector('#menu-btn');
-let navbar = document.querySelector('.navbar');
-
+let menu = document.querySelector("#menu-btn");
+let navbar = document.querySelector(".navbar");
 
 var swiper = new Swiper(".review-slider", {
     spaceBetween: 20,
@@ -16,10 +15,10 @@ var swiper = new Swiper(".review-slider", {
     },
     breakpoints: {
         0: {
-            slidesPerView: 1
+            slidesPerView: 1,
         },
         768: {
-            slidesPerView: 2
-        }
+            slidesPerView: 2,
+        },
     },
 });

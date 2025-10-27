@@ -12,7 +12,15 @@
 <body>
     <div class="sign-form-container">
         <h1 class="heading">Admin Sign In</h1>
-
+    @if ($errors->has('email'))
+        <div id="error-message">
+            <strong>{{ $errors->first('email') }}</strong>
+        </div>
+    @elseif ($errors->has('password'))
+        <div id="error-message">
+            <strong>{{ $errors->first('password') }}</strong>
+        </div>
+    @endif
         <form action="{{ route('login.admin.post') }}" method="POST">
             @csrf
       <label for="email">Email Address</label>

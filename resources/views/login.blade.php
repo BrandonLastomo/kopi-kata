@@ -9,13 +9,21 @@
 </head>
 
 <body>
-  @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-  @endif
   <div class="sign-form-container">
     <h1 class="heading">Sign In</h1>
+    @if (session('success'))
+        <div id="success-message">
+            {{ session('success') }}
+        </div>
+    @elseif ($errors->has('email'))
+        <div id="error-message">
+            <strong>{{ $errors->first('email') }}</strong>
+        </div>
+    @elseif ($errors->has('password'))
+        <div id="error-message">
+            <strong>{{ $errors->first('password') }}</strong>
+        </div>
+    @endif
     <form action="{{ route('login.post') }}" method="POST">
       @csrf
       <label for="email">email</label>
