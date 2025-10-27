@@ -74,7 +74,7 @@ class TableController extends Controller
         ]);
 
         Table::create($data);
-        return redirect()->route('admin_tables')->with('success', 'Meja baru berhasil ditambahkan');
+        return redirect()->route('tables.index')->with('success', 'Meja baru berhasil ditambahkan');
     }
 
     public function update(Request $request, Table $table)
@@ -102,6 +102,6 @@ class TableController extends Controller
         }
 
         $table->delete();
-        return redirect()->route('admin_tables')->with('success', 'Meja berhasil dihapus');
+        return redirect()->route('tables.index')->with('success', 'Meja berhasil dihapus');
     }
 }

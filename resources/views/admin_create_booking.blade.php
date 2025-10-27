@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Booking | Admin Panel</title>
+    <title>Tambah Booking | Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
@@ -152,7 +152,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="header">
-                <h1>Edit Booking</h1>
+                <h1>Tambah Booking</h1>
                 <div class="admin-info">
                     <a href="{{ route('bookings.index') }}" class="btn" style="background-color:#6c757d;color:white;padding:8px 15px;border-radius:5px;text-decoration:none;">Kembali</a>
                 </div>
@@ -167,32 +167,32 @@
                 @endif
 
                 <div class="form-container">
-                    <!-- ✅ FORM DIBETULKAN -->
-                    <form action="{{ route('bookings.update', $booking->id) }}" method="POST">
+                    <!-- ✅ FORM TAMBAH BOOKING -->
+                    <form action="{{ route('bookings.store') }}" method="POST">
                         @csrf
-                        @method('PUT')
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="name">Nama</label>
-                                <input type="text" id="name" name="name" value="{{ old('name', $booking->name) }}" required>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" name="email" value="{{ old('email', $booking->email) }}" required>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="phone">Nomor Telepon</label>
-                                <input type="text" id="phone" name="phone" value="{{ old('phone', $booking->phone) }}">
+                                <input type="text" id="phone" name="phone" value="{{ old('phone') }}">
                             </div>
                             <div class="form-group">
                                 <label for="table_number">Nomor Meja</label>
                                 <select id="table_number" name="table_number" required>
+                                    <option value="">-- Pilih Meja --</option>
                                     @for ($i = 1; $i <= $totalTables; $i++)
-                                        <option value="{{ $i }}" {{ $booking->table_number == $i ? 'selected' : '' }}>Meja {{ $i }}</option>
+                                        <option value="{{ $i }}" {{ old('table_number') == $i ? 'selected' : '' }}>Meja {{ $i }}</option>
                                     @endfor
                                 </select>
                             </div>
@@ -201,21 +201,23 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="booking_date">Tanggal Booking</label>
-                                <input type="date" id="booking_date" name="booking_date" value="{{ old('booking_date', $booking->booking_date) }}" required>
+                                <input type="date" id="booking_date" name="booking_date" value="{{ old('booking_date') }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="start_time">Waktu Mulai</label>
                                 <select id="start_time" name="start_time" required>
+                                    <option value="">-- Pilih Waktu --</option>
                                     @foreach (['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'] as $time)
-                                        <option value="{{ $time }}" {{ $booking->start_time == $time.':00' ? 'selected' : '' }}>{{ $time }}</option>
+                                        <option value="{{ $time }}" {{ old('start_time') == $time ? 'selected' : '' }}>{{ $time }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="end_time">Waktu Selesai</label>
                                 <select id="end_time" name="end_time" required>
+                                    <option value="">-- Pilih Waktu --</option>
                                     @foreach (['12:00', '14:00', '16:00', '18:00', '20:00', '22:00'] as $time)
-                                        <option value="{{ $time }}" {{ $booking->end_time == $time.':00' ? 'selected' : '' }}>{{ $time }}</option>
+                                        <option value="{{ $time }}" {{ old('end_time') == $time ? 'selected' : '' }}>{{ $time }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -223,10 +225,10 @@
 
                         <div class="form-group">
                             <label for="message">Pesan / Permintaan Khusus</label>
-                            <textarea id="message" name="message">{{ old('message', $booking->message) }}</textarea>
+                            <textarea id="message" name="message">{{ old('message') }}</textarea>
                         </div>
 
-                        <button type="submit" class="submit-btn">Perbarui Booking</button>
+                        <button type="submit" class="submit-btn">Tambah Booking</button>
                     </form>
                 </div>
             </div>

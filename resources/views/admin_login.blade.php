@@ -15,8 +15,6 @@
 
         <form action="{{ route('login.admin.post') }}" method="POST">
             @csrf
-      <label for="name">Name</label>
-      <input type="text" name="name" id="name" placeholder="Username" required />
       <label for="email">Email Address</label>
       <input type="email" name="email" id="email" placeholder="Email" required />
       <label for="password">Password</label>

@@ -12,20 +12,25 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    public function loginPage(){
+    public function loginPage()
+    {
         return view('admin_login');
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->route('dashboard');
         }
+
+        return back()->withErrors(['email' => 'Email atau password salah.']);
     }
 
     public function index(Request $request)
@@ -39,11 +44,13 @@ class UserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->get();
-        
-        $editMode = false; // Initialize editMode
+
         $editUser = null;
+        $editMode = false;
+
         if ($editId = $request->input('edit')) {
             $editUser = User::find($editId);
+            $editMode = true;
         }
 
         return view('admin_users', compact('users', 'editUser', 'editMode', 'search'));
@@ -58,7 +65,10 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ]);
 
-        User::create($data); // Model User akan otomatis hash password
+        // Hash password sebelum disimpan
+        $data['password'] = Hash::make($data['password']);
+
+        User::create($data);
 
         return redirect()->route('admin_users')->with('success', 'User baru berhasil ditambahkan');
     }
@@ -72,31 +82,30 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ]);
 
-        // Update password hanya jika diisi
+        // Update password jika diisi
         if (!empty($data['password'])) {
-            $user->password = $data['password']; // Model akan otomatis hash
+            $user->password = Hash::make($data['password']);
         }
-        
+
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->role = $data['role'];
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'Data user berhasil diperbarui');
+        return redirect()->route('admin_users')->with('success', 'Data user berhasil diperbarui');
     }
 
     public function destroy(User $user)
     {
-        // Mencegah admin menghapus akunnya sendiri
         if (Auth::id() === $user->id) {
-            return redirect()->route('admin.users.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return redirect()->route('admin_users')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         try {
             $user->delete();
-            return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus');
+            return redirect()->route('admin_users')->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
-            return redirect()->route('admin.users.index')->with('error', 'Gagal menghapus user: ' . $e->getMessage());
+            return redirect()->route('admin_users')->with('error', 'Gagal menghapus user: ' . $e->getMessage());
         }
     }
 }

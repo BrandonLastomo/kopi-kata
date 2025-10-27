@@ -10,8 +10,18 @@ use App\Http\Controllers\BookingController;
 // --- Controller Admin ---
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+
+    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::resource('bookings', AdminBookingController::class);
+});
+
 use App\Http\Controllers\Admin\TableController as AdminTableController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+
+Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin_users');
+Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin_users.store');
+Route::put('/admin/users/{user}', [AdminUserController::class, 'update'])->name('admin_users.update');
+Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin_users.destroy');
 
 Route::get('/login_admin_page', [AdminUserController::class, 'loginPage'])->name('login.admin');
 Route::post('/login_admin', [AdminUserController::class, 'login'])->name('login.admin.post');

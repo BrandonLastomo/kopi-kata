@@ -18,7 +18,6 @@
                 <p>Admin Panel</p>
             </div>
             <nav class="sidebar-nav">
-                {{-- Tautan diubah ke helper route() --}}
                 <div class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <a href="{{ route('dashboard') }}">Dashboard</a>
@@ -35,10 +34,6 @@
                     <i class="fas fa-users"></i>
                     <a href="{{ route('users.index') }}">Kelola Pengguna</a>
                 </div>
-                {{-- <div class="nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i>
-                    <a href="{{ route('admin.settings') }}">Pengaturan</a>
-                </div> --}}
             </nav>
         </aside>
 
@@ -46,20 +41,14 @@
             <div class="header">
                 <h1>Dashboard</h1>
                 <div class="admin-info">
-                    {{-- $admin_name dikirim dari middleware --}}
                     <span>Selamat datang, {{ $admin_name ?? 'Admin' }}</span>
-                    
-                    {{-- Tombol Logout diubah menjadi form --}}
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf
-                        <a href="{{ route('logout') }}" class="logout-btn">
-                            Logout
-                        </a>
+                        <a href="{{ route('logout') }}" class="logout-btn">Logout</a>
                     </form>
                 </div>
             </div>
 
-            {{-- Menampilkan error jika ada --}}
             @if(!empty($error))
                 <div style="padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #f8d7da; color: #721c24;">
                     {{ $error }}
@@ -72,7 +61,6 @@
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <div class="stat-info">
-                        {{-- Menggunakan sintaks Blade dan null safety --}}
                         <h3>{{ $stats['total_bookings'] ?? 0 }}</h3>
                         <p>Total Bookings</p>
                     </div>
@@ -100,7 +88,6 @@
             <div class="content-card">
                 <div class="content-header">
                     <h2>Visualisasi Meja</h2>
-                    {{-- Form action diubah ke route() --}}
                     <form class="filter-form" method="GET" action="{{ route('dashboard') }}">
                         <input type="date" name="filter_date" value="{{ $selectedDate }}" required>
                         <button type="submit">Filter</button>
@@ -108,10 +95,11 @@
                 </div>
 
                 <div class="time-slots">
-                    {{-- PHP Loop diubah ke Blade --}}
                     @php
+                        use Carbon\Carbon;
                         $timeSlots = ['10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
                     @endphp
+
                     @foreach ($timeSlots as $slot)
                         @php
                             list($startTime, $endTime) = explode('-', $slot);
@@ -121,27 +109,32 @@
                                 <h3>{{ $slot }}</h3>
                             </div>
                             <div class="time-tables">
-                                {{-- Asumsi 10 meja, ini bisa diganti $totalTables dari controller --}}
                                 @for ($i = 1; $i <= 10; $i++)
                                     @php
                                         $isBooked = false;
                                         $bookedBy = '';
 
-                                        // Logika PHP yang sama persis
+                                        // ✅ Perbandingan waktu menggunakan Carbon agar akurat
                                         foreach ($filtered_bookings as $booking) {
-                                            if (
-                                                $booking['table_number'] == $i &&
-                                                (($booking['start_time'] <= $startTime && $booking['end_time'] > $startTime) ||
-                                                    ($booking['start_time'] < $endTime && $booking['end_time'] >= $endTime) ||
-                                                    ($booking['start_time'] >= $startTime && $booking['start_time'] < $endTime))
-                                            ) {
-                                                $isBooked = true;
-                                                $bookedBy = $booking['name'];
-                                                break;
+                                            if ($booking['table_number'] == $i) {
+                                                $bookingStart = Carbon::parse($booking['start_time']);
+                                                $bookingEnd = Carbon::parse($booking['end_time']);
+                                                $slotStart = Carbon::createFromFormat('H:i', $startTime);
+                                                $slotEnd = Carbon::createFromFormat('H:i', $endTime);
+
+                                                if (
+                                                    ($bookingStart->lessThanOrEqualTo($slotStart) && $bookingEnd->greaterThan($slotStart)) ||
+                                                    ($bookingStart->lessThan($slotEnd) && $bookingEnd->greaterThanOrEqualTo($slotEnd)) ||
+                                                    ($bookingStart->greaterThanOrEqualTo($slotStart) && $bookingStart->lessThan($slotEnd))
+                                                ) {
+                                                    $isBooked = true;
+                                                    $bookedBy = $booking['name'];
+                                                    break;
+                                                }
                                             }
                                         }
                                     @endphp
-                                    {{-- Output Blade --}}
+
                                     <div class="mini-table {{ $isBooked ? 'booked' : '' }}"
                                         title="{{ $isBooked ? 'Booked by: ' . htmlspecialchars($bookedBy) : 'Available' }}">
                                         {{ $i }}
@@ -172,10 +165,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- PHP if/else diubah ke @forelse --}}
                             @forelse ($recent_bookings as $booking)
                                 @php
-                                    // Logika status yang sama persis
                                     $bookingDate = strtotime($booking['booking_date']);
                                     $today = strtotime(date('Y-m-d'));
 
@@ -193,18 +184,13 @@
                                 <tr>
                                     <td>{{ $booking['name'] }}</td>
                                     <td>{{ $booking['email'] }}</td>
-                                    {{-- Menggunakan Carbon untuk format tanggal --}}
                                     <td>{{ \Carbon\Carbon::parse($booking['booking_date'])->format('d M Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($booking['start_time'])->format('H:i') }} -
-                                        {{ \Carbon\Carbon::parse($booking['end_time'])->format('H:i') }}
-                                    </td>
+                                        {{ \Carbon\Carbon::parse($booking['end_time'])->format('H:i') }}</td>
                                     <td>{{ $booking['table_number'] }}</td>
                                     <td><span class="status {{ $status }}">{{ $statusText }}</span></td>
                                     <td>
-                                        {{-- Tautan diubah ke route() dan form Hapus --}}
-                                        <a href="{{ route('bookings.edit', $booking['id']) }}"
-                                            class="action-btn edit-btn">Edit</a>
-                                        
+                                        <a href="{{ route('bookings.edit', $booking['id']) }}" class="action-btn edit-btn">Edit</a>
                                         <form action="{{ route('bookings.destroy', $booking['id']) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus booking ini?')">
                                             @csrf
                                             @method('DELETE')
@@ -224,9 +210,7 @@
         </main>
     </div>
 
-    {{-- Script JS disalin langsung --}}
     <script>
-        // Toggle sidebar on mobile view
         document.addEventListener('DOMContentLoaded', function () {
             const toggleBtn = document.querySelector('.toggle-sidebar');
             const sidebar = document.querySelector('.sidebar');
