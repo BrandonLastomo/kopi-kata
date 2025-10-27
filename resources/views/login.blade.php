@@ -22,7 +22,7 @@
       <input type="email" name="email" id="email" placeholder="Email" required />
       <label for="password">Password</label>
       <input type="password" name="password" id="password" placeholder="Password" required />
-      <button type="submit">Sign In</button>
+      <button type="submit" class="form-btn">Sign In</button>
     </form>
     <p class="form-footer">Don't have an account? <a href="{{ route('register') }}">Create account</a></p>
   </div>

@@ -23,11 +23,14 @@
 }
 
 * {
+    font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    outline: none;
+    border: none;
     text-decoration: none;
+    transition: all 0.2s linear;
 }
 
 html {
@@ -62,7 +65,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 80%;
+    width: 100%;
     margin: 0 2rem;
     padding: 1rem 2rem;
     background-color: var(--primary);
@@ -86,15 +89,23 @@ nav a {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--secondary);
-    padding: 0.5rem 1.5rem;
-    border-radius: 10rem;
 }
 
-.userInfo p,
-.userInfo a {
-    color: var(--black);
+.userInfo .name,
+.userInfo .log {
     font-weight: 700;
+}
+
+.userInfo .name {
+    background-color: var(--secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 10rem;
+    margin-right: 0.5rem;
+    color: var(--black);
+}
+
+.userInfo .log {
+    color: var(--secondary);
 }
 
 .pageLinks a:hover {
@@ -357,15 +368,10 @@ nav a {
     color: var(--secondary);
 }
 
-.sign-form-container form .btn-container {
-    width: 100%;
-}
-
 .sign-form-container form input {
     width: 32vw;
     padding: 0.75rem 1rem;
     margin-bottom: 1rem;
-    border: 1px solid #ccc;
     border-radius: 8px;
     font-size: var(--textSm);
     outline: none;
@@ -377,7 +383,7 @@ nav a {
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
-.sign-form-container form button {
+.form-btn {
     padding: 0.75rem 1.5rem;
     width: 100%;
     background-color: var(--secondary);
@@ -476,40 +482,6 @@ nav a {
     text-decoration: underline;
 }
 
-/* Back arrow button (optional) */
-.back-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background-color: #f4b95a;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    line-height: 30px;
-    cursor: pointer;
-    user-select: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s;
-}
-
-.back-btn:hover {
-    background-color: #d49a2a;
-}
-
-* {
-    font-family: "Poppins", sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    outline: none;
-    border: none;
-    text-decoration: none;
-    transition: all 0.2s linear;
-}
-
 section {
     padding: 2rem 9%;
 }
@@ -532,40 +504,106 @@ section {
 }
 
 /* BOOK */
-
 .book {
-    background: url(src/images/4419157.jpg);
-    background-position: center;
-    background-size: cover;
-    min-height: 100vh;
+    padding-top: 10%;
 }
 
 .book .heading {
-    margin-top: 50px;
+    text-align: center;
+    width: 100%;
+    font-size: var(--title);
+    font: bold;
+    color: var(--primary);
+    letter-spacing: -6px;
+    position: relative;
+    margin-bottom: 3rem;
 }
 
-.book .heading span {
-    color: white;
+.step-container {
+    display: flex;
+    justify-content: center;
 }
 
-.book form {
-    margin: 0 auto 2rem auto;
-    max-width: 60rem;
-    border-radius: var(--border-radius-hover);
+.step-indicator {
+    display: flex;
+    justify-content: space-evenly;
+    width: 48%;
+    margin-bottom: 2rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48%;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border: solid 1px var(--primary);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.step-circle.active {
+    background-color: var(--secondary);
+}
+
+.step-title {
+    font-size: var(--textMd);
+    color: var(--primary);
+    font-weight: 700;
+    text-align: center;
+}
+
+.step-line {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 100px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%);
+}
+
+.step-circle.active .step-line {
+    background: rgba(244, 185, 90, 0.8);
+}
+
+.book .form-reserve {
+    margin: 0 auto 4rem auto;
+    padding: 2rem !important;
+    max-width: 60vw;
     padding: 3rem;
-    border: var(--border);
+    background-color: var(--primary);
+    border: solid 3px var(--secondary);
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+.book .form-reserve label {
+    font-size: var(--textMd);
+    font-weight: 500 !important;
+    color: var(--secondary) !important;
+    margin-bottom: 0.25rem !important;
 }
 
 .book form .box {
     width: 100%;
-    padding: 1rem 1.2rem;
-    border-radius: 0.5rem;
-    font-size: 1.6rem;
-    background: none;
-    text-transform: none;
-    color: var(--main-color);
-    border: var(--border);
-    margin: 0.7rem 0;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-size: var(--textSm);
+    outline: none;
+    transition: 0.3s;
 }
 
 .book form .box:focus {
@@ -577,107 +615,21 @@ section {
     resize: none;
 }
 
-.book {
-    padding-top: 100px;
-    position: relative;
-}
-
-.book::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-}
-
-.table-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 25px;
-    margin: 40px 0;
-}
-
-.table-item {
-    width: 130px;
-    height: 130px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    border: 2px solid #f4b95a;
-    /* Tambahkan border langsung ke elemen */
-    border-radius: 10px;
-    /* Tambahkan border radius langsung */
-    background-color: rgba(74, 44, 42, 0.7);
-    /* Untuk available */
-}
-
-.booked {
-    background-color: rgba(169, 68, 66, 0.7);
-    border-color: #a94442;
-    cursor: not-allowed;
-}
-
-.table-item:hover::before {
-    border-radius: var(--border-radius-hover);
-}
-
-.available::before {
-    background-color: rgba(74, 44, 42, 0.7);
-    border: var(--border);
-}
-
-.booked::before {
-    background-color: rgba(169, 68, 66, 0.7);
-    border: var(--border);
-    cursor: not-allowed;
-}
-
-.table-item:hover.available::before {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    border: var(--border-hover);
-}
-
-.table-item div {
-    color: white;
-    font-size: 1.8rem;
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.table-item .table-number {
-    font-family: "Clicker Script", cursive;
-    font-size: 3.5rem;
-    margin-bottom: 5px;
-}
-
 .booking-status {
     display: flex;
     justify-content: center;
-    gap: 50px;
-    margin: 30px 0;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
-    padding: 15px;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    gap: 3rem;
+    background-color: var(--secondary);
+    margin: 0 auto;
+    padding: 1rem;
+    max-width: 72vw;
+    border-radius: 10rem;
 }
 
 .status-item {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 0.25rem;
 }
 
 .status-indicator {
@@ -687,21 +639,76 @@ section {
 }
 
 .status-available {
-    background-color: rgba(74, 44, 42, 0.9);
-    border: 2px solid #f4b95a;
+    background-color: #344e41;
+    border: 2px solid var(--black);
 }
 
 .status-booked {
-    background-color: rgba(169, 68, 66, 0.9);
-    border: 2px solid #f4b95a;
+    background-color: #ff6632;
+    border: 2px solid var(--black);
 }
 
 .status-item span {
-    font-size: 1.8rem;
-    color: white;
+    font-size: var(--textLg);
+    color: var(--black);
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: -1px;
+}
+
+.table-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1.5rem 0;
+    gap: 25px;
+}
+
+.table-item {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #f4b95a;
+    /* Tambahkan border langsung ke elemen */
+    border-radius: 1rem;
+    /* Tambahkan border radius langsung */
+    background-color: var(--primary);
+}
+
+.booked {
+    background-color: #ff6632;
+    border: 2px solid var(--black);
+    color: var(--black);
+    cursor: not-allowed;
+}
+
+.available {
+    background-color: var(--primary);
+    border: var(--border);
+}
+
+.table-item:hover.available {
+    transform: translateY(-10%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: var(--border-hover);
+}
+
+.table-item div {
+    color: white;
+    font-size: var(--textMd);
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: -1px;
+}
+
+.table-item .table-number {
+    font-family: "Clicker Script", cursive;
+    font-size: var(--textBg);
+    margin-bottom: 5px;
 }
 
 .success-message {
@@ -726,15 +733,16 @@ section {
     font-size: 1.8rem;
 }
 
-.book form,
-.time-selection-form {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
+.form-group label {
+    color: var(--secondary);
+}
+
+#bookingForm form label {
+    font-size: var(--textSm);
+    font-weight: 500;
+    width: 10vw;
+    background-color: var(--secondary);
+    color: var(--black) !important;
 }
 
 .book form .box,
@@ -771,28 +779,16 @@ section {
 }
 
 .booking-details {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 20px;
-    margin-top: 50px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.booking-details h2 {
-    margin-top: 0;
-    color: white;
-    font-family: "Clicker Script", cursive;
-    font-size: 4rem;
-    text-align: center;
-    margin-bottom: 20px;
+    background: var(--secondary);
+    border: solid 3px var(--primary);
+    padding: 2rem;
+    border-radius: 2rem;
+    margin-top: 4rem;
 }
 
 .booking-list {
-    max-height: 350px;
+    max-height: 54vh;
     overflow-y: auto;
-    padding-right: 10px;
 }
 
 .booking-list::-webkit-scrollbar {
@@ -800,30 +796,32 @@ section {
 }
 
 .booking-list::-webkit-scrollbar-thumb {
-    background: rgba(244, 185, 90, 0.7);
-    border-radius: 10px;
+    background: #ff6632;
 }
 
 .booking-item {
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 1rem 0 0 1rem;
+    background: var(--primary);
     color: white;
 }
 
 .booking-item p {
-    margin: 8px 0;
-    font-size: 1.6rem;
+    margin: 0.25rem 0;
+    font-size: var(--textMd);
 }
 
 .booking-item strong {
-    color: #f4b95a;
+    color: var(--secondary);
 }
 
 .booking-item:last-child {
     margin-bottom: 0;
+}
+
+.delete-book {
+    margin-top: 1rem;
 }
 
 .coffee-decoration {
@@ -846,23 +844,6 @@ section {
     transform: rotate(20deg);
 }
 
-.delete-btn {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: rgba(244, 67, 54, 0.7);
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 1.4rem;
-    transition: all 0.3s ease;
-}
-
-.delete-btn:hover {
-    background-color: rgba(244, 67, 54, 1);
-    transform: translateY(-2px);
-}
-
 .form-row {
     display: flex;
     flex-wrap: wrap;
@@ -878,7 +859,6 @@ section {
 .form-group label {
     display: block;
     color: white;
-    margin-bottom: 5px;
     font-size: 1.6rem;
 }
 
@@ -889,57 +869,6 @@ section {
     margin-bottom: 20px;
     text-align: center;
     font-family: "Poppins", sans-serif;
-}
-
-.step-indicator {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 20px;
-}
-
-.step-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: white;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.step-circle.active {
-    background: rgba(244, 185, 90, 0.8);
-}
-
-.step-title {
-    font-size: 1.4rem;
-    color: white;
-    text-align: center;
-}
-
-.step-line {
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    width: 100px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-50%);
-}
-
-.step-circle.active .step-line {
-    background: rgba(244, 185, 90, 0.8);
 }
 
 .hidden {
@@ -1535,9 +1464,8 @@ tr:hover {
 }
 .form-group label {
     display: block;
-    margin-bottom: 6px;
     font-weight: 500;
-    color: #333;
+    color: var(--primary);
 }
 .form-group input,
 .form-group select,
@@ -1850,15 +1778,10 @@ tr:hover {
     z-index: 1 !important;
 }
 
-.form-group {
-    margin-bottom: 20px !important;
-}
-
 .form-group label {
-    display: block !important;
-    margin-bottom: 5px !important;
-    font-weight: 500 !important;
-    color: #333 !important;
+    display: block;
+    font-weight: 500;
+    color: var(--primary);
 }
 
 .form-group input,
