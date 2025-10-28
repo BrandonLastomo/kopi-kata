@@ -23,10 +23,10 @@
     @endif
         <form action="{{ route('login.admin.post') }}" method="POST">
             @csrf
-      <label for="email">Email Address</label>
-      <input type="email" name="email" id="email" placeholder="Email" required />
-      <label for="password">Password</label>
-      <input type="password" name="password" id="password" placeholder="Password" required />
+            <label for="email">Email Address</label>
+            <input type="email" name="email" id="email" placeholder="Email" required />
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Password" required />
             <button type="submit" class="form-btn">Sign In</button>
         </form>
     </div>

@@ -167,67 +167,56 @@
                 @endif
 
                 <div class="form-container">
-                    <!-- ✅ FORM DIBETULKAN -->
                     <form action="{{ route('bookings.update', $booking->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
+    @csrf
+    @method('PUT')
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="name">Nama</label>
-                                <input type="text" id="name" name="name" value="{{ old('name', $booking->name) }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" value="{{ old('email', $booking->email) }}" required>
-                            </div>
-                        </div>
+    <div class="form-group">
+        <label for="user_id">User</label>
+        <select name="user_id" id="user_id">
+            <option value="">Guest</option>
+            @foreach ($users as $user)
+                <option value="{{ $user->id }}" {{ $booking->user_id == $user->id ? 'selected' : '' }}>
+                    {{ $user->name }} ({{ $user->email }})
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="phone">Nomor Telepon</label>
-                                <input type="text" id="phone" name="phone" value="{{ old('phone', $booking->phone) }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="table_number">Nomor Meja</label>
-                                <select id="table_number" name="table_number" required>
-                                    @for ($i = 1; $i <= $totalTables; $i++)
-                                        <option value="{{ $i }}" {{ $booking->table_number == $i ? 'selected' : '' }}>Meja {{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                        </div>
+    <div class="form-group">
+        <label for="table_id">Meja</label>
+        <select name="table_id" id="table_id" required>
+            @foreach ($tables as $table)
+                <option value="{{ $table->id }}" {{ $booking->table_id == $table->id ? 'selected' : '' }}>
+                    Meja {{ $table->table_number }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="booking_date">Tanggal Booking</label>
-                                <input type="date" id="booking_date" name="booking_date" value="{{ old('booking_date', $booking->booking_date) }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="start_time">Waktu Mulai</label>
-                                <select id="start_time" name="start_time" required>
-                                    @foreach (['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'] as $time)
-                                        <option value="{{ $time }}" {{ $booking->start_time == $time.':00' ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="end_time">Waktu Selesai</label>
-                                <select id="end_time" name="end_time" required>
-                                    @foreach (['12:00', '14:00', '16:00', '18:00', '20:00', '22:00'] as $time)
-                                        <option value="{{ $time }}" {{ $booking->end_time == $time.':00' ? 'selected' : '' }}>{{ $time }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+    <div class="form-group">
+        <label for="booking_date">Tanggal</label>
+        <input type="date" name="booking_date" value="{{ $booking->booking_date }}" required>
+    </div>
 
-                        <div class="form-group">
-                            <label for="message">Pesan / Permintaan Khusus</label>
-                            <textarea id="message" name="message">{{ old('message', $booking->message) }}</textarea>
-                        </div>
+    <div class="form-group">
+        <label for="start_time">Waktu Mulai</label>
+        <input type="time" name="start_time" value="{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}" required>
+    </div>
 
-                        <button type="submit" class="submit-btn">Perbarui Booking</button>
-                    </form>
+    <div class="form-group">
+        <label for="end_time">Waktu Selesai</label>
+        <input type="time" name="end_time" value="{{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="message">Pesan</label>
+        <textarea name="message">{{ $booking->message }}</textarea>
+    </div>
+
+    <button type="submit" class="submit-btn">Perbarui Booking</button>
+</form>
+
                 </div>
             </div>
         </main>

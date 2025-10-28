@@ -49,7 +49,7 @@ class User extends Authenticatable
      */
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'email', 'email');
+        return $this->hasMany(Booking::class);
     }
 
     /**

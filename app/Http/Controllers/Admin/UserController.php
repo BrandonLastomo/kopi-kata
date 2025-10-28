@@ -29,8 +29,6 @@ class UserController extends Controller
             $request->session()->regenerate();
             return redirect()->route('dashboard');
         }
-
-        return back()->withErrors(['email' => 'Email atau password salah.']);
     }
 
     public function index(Request $request)

@@ -13,6 +13,8 @@ class Booking extends Model
      * Atribut yang dapat diisi secara massal.
      */
     protected $fillable = [
+        'user_id',
+        'table_id',
         'name',
         'email',
         'phone',
@@ -38,7 +40,7 @@ class Booking extends Model
     public function table()
     {
         // Relasi berdasarkan table_number
-        return $this->belongsTo(Table::class, 'table_number', 'table_number');
+        return $this->belongsTo(Table::class);
     }
 
     /**
@@ -47,6 +49,6 @@ class Booking extends Model
     public function user()
     {
         // Relasi berdasarkan email
-        return $this->belongsTo(User::class, 'email', 'email');
+        return $this->belongsTo(User::class);
     }
 }

@@ -5,17 +5,17 @@
         <h1 class="heading">Reserve Your Place</h1>
 
         @if (session('success'))
-            <div class="success-message">
+            <div id="success-message">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
             </div>
         @endif
         @if (session('error'))
-            <div class="error-message">
+            <div id="error-message">
                 <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
             </div>
         @endif
         @if ($errors->any())
-             <div class="error-message">
+             <div id="error-message">
                 <i class="fas fa-exclamation-circle"></i>
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     @foreach ($errors->all() as $error)
@@ -80,64 +80,78 @@
         </form>
 
         @if (request()->has('check_availability'))
-            <div id="tableSelectionSection">
-                <h1 class="heading">Choose Your Table</h1>
-                <div class="booking-status">
-                    <div class="status-item">
-                        <div class="status-indicator status-available"></div>
-                        <span>Available ({{ $availableTables }})</span>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-indicator status-booked"></div>
-                        <span>Booked ({{ $bookedTableNumbers->count() }})</span>
-                    </div>
-                </div>
+    <div id="tableSelectionSection">
+        <h1 class="heading">Choose Your Table</h1>
 
-                <div class="table-container">
-                    @for ($i = 1; $i <= $totalTables; $i++)
-                        @php
-                            // Gunakan method 'contains' pada koleksi
-                            $isBooked = $bookedTableNumbers->contains($i);
-                            $tableClass = $isBooked ? 'booked' : 'available';
-                        @endphp
-                        <div class="table-item {{ $tableClass }}" data-table="{{ $i }}">
-                            <div class="table-number">{{ $i }}</div>
-                            <div>{{ $isBooked ? 'Booked' : 'Available' }}</div>
-                        </div>
-                    @endfor
-                </div>
-
-                <div id="bookingForm" class="hidden">
-                    <h1 class="heading">Isi Informasi Booking</h1>
-                    <form action="{{ route('book.store') }}" class="form-reserve" method="POST">
-                        @csrf
-                        <label for="Name">Name</label>
-                        <input type="text" name="name" id="name" placeholder="Your Name" class="box" value="{{ old('name', Auth::user()->name) }}" required>
-                        <label for="Email">Email</label>
-                        <input type="email" name="email" id="email" placeholder="Your Email" class="box" value="{{ old('email', Auth::user()->email) }}" required>
-                        <label for="Phone Number">Phone Number</label>
-                        <input type="text" name="phone" id="phone" placeholder="Phone Number" class="box" value="{{ old('phone') }}">
-                        <label for="Message(s)">Message(s)</label>
-                        <textarea name="message" placeholder="Special requests or message" class="box" cols="30" rows="10">{{ old('message') }}</textarea>
-
-                        <input type="hidden" name="booking_date" value="{{ $selectedDate }}">
-                        <input type="hidden" name="start_time" value="{{ $selectedStartTime }}">
-                        <input type="hidden" name="end_time" value="{{ $selectedEndTime }}">
-                        <input type="hidden" name="table_number" id="selected_table" value="{{ old('table_number') }}">
-
-                        <input type="submit" id="submitBtn" value="Book Your Table Now" class="form-btn">
-                    </form>
-                </div>
+        <div class="booking-status">
+            <div class="status-item">
+                <div class="status-indicator status-available"></div>
+                <span>Available ({{ $availableTables }})</span>
             </div>
-        @endif
+            <div class="status-item">
+                <div class="status-indicator status-booked"></div>
+                <span>Booked ({{ $bookedTableIds->count() }})</span>
+            </div>
+        </div>
+
+        {{-- 🪑 Table grid --}}
+        <div class="table-container">
+            @foreach ($tables as $table)
+                @php
+                    $isBooked = $bookedTableIds->contains($table->id);
+                    $tableClass = $isBooked ? 'booked' : 'available';
+                @endphp
+                <div class="table-item {{ $tableClass }}"
+                    data-table-id="{{ $table->id }}"
+                    data-table-number="{{ $table->table_number }}">
+                    <div class="table-number">{{ $table->table_number }}</div>
+                    <div>{{ $isBooked ? 'Booked' : 'Available' }}</div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- 📝 Booking form --}}
+        <div id="bookingForm" class="hidden">
+            <h1 class="heading">Isi Informasi Booking</h1>
+            <form action="{{ route('book.store') }}" class="form-reserve" method="POST">
+                @csrf
+
+                {{-- Hidden data for relations --}}
+                <input type="hidden" name="user_id" value="{{ Auth::id() }}">
+                <input type="hidden" name="table_id" id="selected_table" value="{{ old('table_id') }}">
+                <input type="hidden" name="booking_date" value="{{ $selectedDate }}">
+                <input type="hidden" name="start_time" value="{{ $selectedStartTime }}">
+                <input type="hidden" name="end_time" value="{{ $selectedEndTime }}">
+
+                <label for="Name">Name</label>
+                <input type="text" id="name" placeholder="Your Name" class="box"
+                       value="{{ old('name', Auth::user()->name) }}" disabled required>
+
+                <label for="Email">Email</label>
+                <input type="email" id="email" placeholder="Your Email" class="box"
+                       value="{{ old('email', Auth::user()->email) }}" disabled required>
+
+                <label for="Phone Number">Phone Number</label>
+                <input type="text" name="phone" id="phone" placeholder="Phone Number" class="box"
+                       value="{{ old('phone') }}">
+
+                <label for="Message(s)">Message(s)</label>
+                <textarea name="message" placeholder="Special requests or message" class="box" cols="30" rows="10">{{ old('message') }}</textarea>
+
+                <input type="submit" id="submitBtn" value="Book Your Table Now" class="form-btn">
+            </form>
+        </div>
+    </div>
+@endif
+
 
         <div class="booking-details">
             <h1 class="heading">Recent Bookings</h1>
             <div class="booking-list">
                 @forelse ($bookings as $booking)
                     <div class="booking-item">
-                        <p><strong><i class="fas fa-user"></i> Name:</strong> {{ $booking->name }}</p>
-                        <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ $booking->email }}</p>
+                        <p><strong><i class="fas fa-user"></i> Name:</strong> {{ $booking->user->name ?? 'Tamu' }}</p>
+                        <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ $booking->user->email ?? 'N/A' }}</p>
                         <p><strong><i class="fas fa-phone"></i> Phone:</strong> {{ $booking->phone }}</p>
                         <p><strong><i class="fas fa-calendar-day"></i> Date:</strong>
                             {{ $booking->booking_date->format('d M Y') }}</p>
@@ -145,7 +159,7 @@
                             {{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} -
                             {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}
                         </p>
-                        <p><strong><i class="fas fa-chair"></i> Table:</strong> #{{ $booking->table_number }}</p>
+                        <p><strong><i class="fas fa-chair"></i> Table:</strong> #{{ $booking->table->id ?? 'Unknown' }}</p>
                         <p><strong><i class="fas fa-calendar-alt"></i> Booked on:</strong>
                             {{ $booking->created_at->format('d M Y H:i') }}</p>
                         @if (!empty($booking->message))
@@ -170,14 +184,17 @@
     </section>  
 
 @push('scripts')
-    {{-- Salin semua JS dari file lama ke sini --}}
-    <script>
-        // Script untuk validasi waktu (sama seperti file asli)
-        document.getElementById('start_time').addEventListener('change', function () {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 🕓 Validate time selection
+    const startTimeSelect = document.getElementById('start_time');
+    if (startTimeSelect) {
+        startTimeSelect.addEventListener('change', function () {
             const startTime = this.value;
             const endTimeSelect = document.getElementById('end_time');
             const startHour = parseInt(startTime.split(':')[0]);
-            let minEndHour = startHour + 2;
+            const minEndHour = startHour + 2;
 
             Array.from(endTimeSelect.options).forEach(option => {
                 const endHour = parseInt(option.value.split(':')[0]);
@@ -194,44 +211,56 @@
                 }
             }
         });
+    }
 
-        // Script untuk menangani klik pada meja
-        document.addEventListener('DOMContentLoaded', function () {
-            @if (request()->has('check_availability'))
-                // Tambahkan event listener ke meja yang tersedia
-                document.querySelectorAll('.table-item.available').forEach(table => {
-                    table.addEventListener('click', function () {
+    // 🪑 Handle table selection
+    @if (request()->has('check_availability'))
+        const availableTables = document.querySelectorAll('.table-item.available');
+        const bookingForm = document.getElementById('bookingForm');
+        const selectedTableInput = document.getElementById('selected_table');
+        const submitBtn = document.getElementById('submitBtn');
 
-                        const tableNumber = this.getAttribute('data-table');
-
-                        document.querySelectorAll('.table-item.available').forEach(t => {
-                            t.style.transform = 'scale(1)';
-                            t.style.boxShadow = 'none';
-                        });
-
-                        this.style.transform = 'scale(1.1)';
-                        this.style.boxShadow = '0 0 16px var(--secondary)';
-                        document.getElementById('step3').classList.add('active');
-                        document.getElementById('bookingForm').classList.toggle('hidden');
-                        document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth' });
-                        document.getElementById('selected_table').value = tableNumber;
-                        document.getElementById('submitBtn').value = `Book Table ${tableNumber} on {{ $selectedDate }}`;
-                    });
+        availableTables.forEach(table => {
+            table.addEventListener('click', function () {
+                // Reset previous selection
+                availableTables.forEach(t => {
+                    t.style.transform = 'scale(1)';
+                    t.style.boxShadow = 'none';
                 });
 
-                // Jika ada old input (setelah validasi gagal), tampilkan form
-                const oldTable = document.getElementById('selected_table').value;
-                if(oldTable) {
-                    document.getElementById('bookingForm').classList.remove('hidden');
-                    document.getElementById('step3').classList.add('active');
-                    const selectedTableEl = document.querySelector(`.table-item[data-table="${oldTable}"]`);
-                    if(selectedTableEl && selectedTableEl.classList.contains('available')) {
-                         selectedTableEl.style.transform = 'scale(1.1)';
-                         selectedTableEl.style.boxShadow = '0 0 20px rgba(244, 185, 90, 0.7)';
-                    }
-                }
-            @endif
+                // Highlight selected table
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 0 16px var(--secondary)';
+
+                // Get data from table
+                const tableId = this.getAttribute('data-table-id');
+                const tableNumber = this.getAttribute('data-table-number');
+
+                // Fill hidden input and show form
+                selectedTableInput.value = tableId;
+                bookingForm.classList.remove('hidden');
+                document.getElementById('step3').classList.add('active');
+                bookingForm.scrollIntoView({ behavior: 'smooth' });
+
+                // Update submit button label
+                submitBtn.value = `Book Table ${tableNumber} on {{ $selectedDate }}`;
+            });
         });
-    </script>
+
+        // Show form again if user had selected a table before (after validation error)
+        const oldTable = selectedTableInput.value;
+        if (oldTable) {
+            bookingForm.classList.remove('hidden');
+            document.getElementById('step3').classList.add('active');
+            const selectedTableEl = document.querySelector(`.table-item[data-table-id="${oldTable}"]`);
+            if (selectedTableEl && selectedTableEl.classList.contains('available')) {
+                selectedTableEl.style.transform = 'scale(1.1)';
+                selectedTableEl.style.boxShadow = '0 0 16px var(--secondary)';
+            }
+        }
+    @endif
+});
+</script>
 @endpush
+
 @endsection

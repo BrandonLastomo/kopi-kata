@@ -26,6 +26,6 @@ class Table extends Model
     public function bookings()
     {
         // Relasi berdasarkan table_number
-        return $this->hasMany(Booking::class, 'table_number', 'table_number');
+        return $this->hasMany(Booking::class);
     }
 }

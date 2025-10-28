@@ -141,59 +141,46 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- Loop diubah ke @foreach Blade, $counter diganti $loop->iteration --}}
-                                @foreach ($bookings as $booking)
-                                    @php
-                                        // Logika status yang sama persis
-                                        $bookingDate = strtotime($booking->booking_date);
-                                        $today = strtotime(date('Y-m-d'));
+@foreach ($bookings as $booking)
+    @php
+        $bookingDate = strtotime($booking->booking_date);
+        $today = strtotime(date('Y-m-d'));
 
-                                        if ($bookingDate > $today) {
-                                            $status = 'upcoming';
-                                            $statusText = 'Mendatang';
-                                        } elseif ($bookingDate == $today) {
-                                            $status = 'today';
-                                            $statusText = 'Hari Ini';
-                                        } else {
-                                            $status = 'past';
-                                            $statusText = 'Lewat';
-                                        }
-                                    @endphp
-                                    <tr>
-                                        {{-- Menggunakan nomor dari pagination --}}
-                                        <td>{{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}</td>
-                                        <td>{{ $booking->name }}</td>
-                                        <td>
-                                            {{ $booking->email }}<br>
-                                            <small>{{ $booking->phone }}</small>
-                                        </td>
-                                        <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</td>
-                                        <td>
-                                            {{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} -
-                                            {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}
-                                        </td>
-                                        <td>
-                                            {{ $booking->table_number }}
-                                        </td>
-                                        <td><span class="status {{ $status }}">{{ $statusText }}</span></td>
-                                        <td>
-                                            {{-- Tautan Edit diubah ke route() --}}
-                                            <a href="{{ route('bookings.edit', $booking->id) }}"
-                                                class="action-btn edit-btn">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            {{-- Tautan Hapus diubah ke form --}}
-                                            <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus booking ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="action-btn delete-btn" style="border:none; cursor:pointer;">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
+        if ($bookingDate > $today) {
+            $status = 'upcoming';
+            $statusText = 'Mendatang';
+        } elseif ($bookingDate == $today) {
+            $status = 'today';
+            $statusText = 'Hari Ini';
+        } else {
+            $status = 'past';
+            $statusText = 'Lewat';
+        }
+    @endphp
+    <tr>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $booking->user->name ?? '-' }}</td>
+        <td>{{ $booking->user->email ?? '-' }}</td>
+        <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</td>
+        <td>{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</td>
+        <td>{{ $booking->table->table_number ?? '-' }}</td>
+        <td><span class="status {{ $status }}">{{ $statusText }}</span></td>
+        <td>
+            <a href="{{ route('bookings.edit', $booking->id) }}" class="action-btn edit-btn">
+                <i class="fas fa-edit"></i>
+            </a>
+            <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="action-btn delete-btn" onclick="return confirm('Hapus booking ini?')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+@endforeach
+</tbody>
+
                         </table>
 
                         {{-- Menggunakan helper links() dari pagination Laravel --}}

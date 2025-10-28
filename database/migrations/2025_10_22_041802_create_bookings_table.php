@@ -10,11 +10,9 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // Opsional, jika terhubung ke tabel users
-            $table->string('name');
-            $table->string('email');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade');
             $table->string('phone')->nullable();
-            $table->integer('table_number');
             $table->date('booking_date');
             $table->time('start_time');
             $table->time('end_time');
@@ -22,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Index untuk mempercepat query pencarian ketersediaan
-            $table->index(['booking_date', 'table_number']);
+            $table->index(['booking_date', 'table_id']);
         });
     }
     public function down(): void

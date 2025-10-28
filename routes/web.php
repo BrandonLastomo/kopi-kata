@@ -4,17 +4,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
-
 use App\Http\Controllers\BookingController;
 
 // --- Controller Admin ---
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-
-    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
-    Route::resource('bookings', AdminBookingController::class);
-});
-
 use App\Http\Controllers\Admin\TableController as AdminTableController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
@@ -23,7 +17,7 @@ Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin_
 Route::put('/admin/users/{user}', [AdminUserController::class, 'update'])->name('admin_users.update');
 Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin_users.destroy');
 
-Route::get('/login_admin_page', [AdminUserController::class, 'loginPage'])->name('login.admin');
+Route::get('/login_admin', [AdminUserController::class, 'loginPage'])->name('login.admin');
 Route::post('/login_admin', [AdminUserController::class, 'login'])->name('login.admin.post');
 
 Route::get('/register', [UserController::class, 'registerPage'])->name('register');
@@ -31,10 +25,9 @@ Route::post('/register', [UserController::class, 'register'])->name('register.po
 Route::get('/login', [UserController::class, 'loginPage'])->name('login');
 Route::post('/login', [UserController::class, 'login'])->name('login.post');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Rute yang memerlukan login (menggantikan auth_check.php)
 Route::middleware('auth')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
     // Halaman Booking (book.php)
     Route::get('book', [BookingController::class, 'index'])->name('book.index');
     

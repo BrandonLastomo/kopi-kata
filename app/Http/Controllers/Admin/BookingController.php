@@ -6,239 +6,158 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Table;
-use App\Models\User; // ✅ Tambahan
+use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
     /**
-     * Menampilkan halaman booking (Step 1, 2, 3).
+     * Tampilkan daftar booking untuk admin.
      */
     public function index(Request $request)
     {
-        // Mengambil semua booking untuk list "Recent Bookings"
-        $bookings = Booking::orderBy('created_at', 'desc')->limit(10)->get();
-        $totalTables = Table::count();
-
-        $selectedDate = $request->input('date', Carbon::today()->toDateString());
-        $selectedStartTime = $request->input('start_time', '10:00');
-        $selectedEndTime = $request->input('end_time', '12:00');
-        
-        $bookedTableNumbers = collect();
-        $availableTables = $totalTables;
-
         $search = $request->input('search', '');
         $status_filter = $request->input('status', 'all');
         $date_from = $request->input('date_from', '');
         $date_to = $request->input('date_to', '');
         $sort = $request->input('sort', 'newest');
 
-        $query = Booking::query();
+        $query = Booking::with(['user', 'table']);
 
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('phone', 'like', "%$search%");
             });
         }
 
-        $records_per_page = 10;
-        $bookings = $query->paginate($records_per_page)->withQueryString();
-
-        if ($request->has('check_availability')) {
-            $request->validate([
-                'date' => 'required|date|after_or_equal:today',
-                'start_time' => 'required|date_format:H:i',
-                'end_time' => 'required|date_format:H:i|after:start_time',
-            ]);
-
-            try {
-                $bookedTableNumbers = Booking::where('booking_date', $selectedDate)
-                    ->where(function ($query) use ($selectedStartTime, $selectedEndTime) {
-                        $query->where('start_time', '<', $selectedEndTime)
-                              ->where('end_time', '>', $selectedStartTime);
-                    })
-                    ->pluck('table_number');
-
-                $availableTables = $totalTables - $bookedTableNumbers->count();
-
-            } catch (\Exception $e) {
-                return redirect()->route('book.index')
-                                 ->with('error', 'Gagal memeriksa ketersediaan: ' . $e->getMessage());
-            }
+        if ($date_from && $date_to) {
+            $query->whereBetween('booking_date', [$date_from, $date_to]);
         }
 
-        return view('admin_bookings', compact(
-            'bookings',
-            'totalTables',
-            'selectedDate',
-            'selectedStartTime',
-            'selectedEndTime',
-            'bookedTableNumbers',
-            'availableTables',
-            'search',
-            'status_filter',
-            'date_from',
-            'date_to',
-            'sort',
-        ));
+        if ($status_filter === 'today') {
+            $query->whereDate('booking_date', Carbon::today());
+        } elseif ($status_filter === 'upcoming') {
+            $query->whereDate('booking_date', '>', Carbon::today());
+        } elseif ($status_filter === 'past') {
+            $query->whereDate('booking_date', '<', Carbon::today());
+        }
+
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('booking_date', 'asc');
+                break;
+            case 'name_asc':
+                $query->join('users', 'bookings.user_id', '=', 'users.id')
+                      ->orderBy('users.name', 'asc');
+                break;
+            case 'name_desc':
+                $query->join('users', 'bookings.user_id', '=', 'users.id')
+                      ->orderBy('users.name', 'desc');
+                break;
+            default:
+                $query->orderBy('booking_date', 'desc');
+        }
+
+        $bookings = $query->paginate(10)->withQueryString();
+
+        return view('admin_bookings', compact('bookings', 'search', 'status_filter', 'date_from', 'date_to', 'sort'));
     }
 
     /**
-     * Menampilkan form tambah booking baru (Admin).
+     * Tampilkan form tambah booking baru.
      */
     public function create()
     {
-        $totalTables = \App\Models\Table::count();
-        $bookings = Booking::latest()->take(5)->get();
-
-        // ✅ Tambahan baris berikut agar $users & $tables dikirim ke view
-        $users = User::all();
         $tables = Table::all();
+        $users = User::all();
 
-        return view('admin_create_booking', compact('totalTables', 'bookings', 'users', 'tables'));
+        return view('admin_create_booking', compact('tables', 'users'));
     }
 
     /**
-     * Menyimpan booking baru dari user.
+     * Simpan booking baru ke database.
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'message' => 'nullable|string',
-            'table_number' => 'required|integer|min:1',
+        $validated = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'table_id' => 'required|exists:tables,id',
             'booking_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'message' => 'nullable|string|max:500',
         ]);
 
-        try {
-            $isOccupied = Booking::where('booking_date', $validatedData['booking_date'])
-                ->where('table_number', $validatedData['table_number'])
-                ->where(function ($query) use ($validatedData) {
-                    $query->where('start_time', '<', $validatedData['end_time'])
-                          ->where('end_time', '>', $validatedData['start_time']);
-                })
-                ->exists();
+        // Validasi ketersediaan meja
+        $isOccupied = Booking::where('booking_date', $validated['booking_date'])
+            ->where('table_id', $validated['table_id'])
+            ->where(function ($q) use ($validated) {
+                $q->where('start_time', '<', $validated['end_time'])
+                  ->where('end_time', '>', $validated['start_time']);
+            })
+            ->exists();
 
-            if ($isOccupied) {
-                return redirect()->back()
-                                 ->withInput()
-                                 ->with('error', 'Maaf, meja tersebut sudah dibooking pada waktu yang Anda pilih.');
-            }
-
-            Booking::create($validatedData);
-
-            return redirect()->route('bookings.index')->with('success', 'Booking berhasil! Terima kasih.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+        if ($isOccupied) {
+            return back()->withInput()->with('error', 'Meja tersebut sudah dibooking pada waktu tersebut.');
         }
+
+        Booking::create($validated);
+
+        return redirect()->route('bookings.index')->with('success', 'Booking berhasil ditambahkan.');
     }
 
+    /**
+     * Edit booking.
+     */
     public function edit(Booking $booking)
     {
-        $error = session('error');
-        $success = session('success');
-        $totalTables = Table::count(); 
+        $tables = Table::all();
+        $users = User::all();
 
-        return view('admin_edit_bookings', compact(
-            'booking',
-            'error',
-            'success',
-            'totalTables'
-        ));
+        return view('admin_edit_bookings', compact('booking', 'tables', 'users'));
     }
 
+    /**
+     * Update booking yang sudah ada.
+     */
     public function update(Request $request, Booking $booking)
     {
-        $error = '';
-
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:100',
-            'phone' => 'nullable|string|max:20',
-            'table_number' => 'required|integer|min:1',
+        $validated = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'table_id' => 'required|exists:tables,id',
             'booking_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'message' => 'nullable|string',
+            'message' => 'nullable|string|max:500',
         ]);
 
-        $name = $validatedData['name'];
-        $email = $validatedData['email'];
-        $phone = $validatedData['phone'];
-        $table_number = $validatedData['table_number'];
-        $booking_date = $validatedData['booking_date'];
-        $start_time = $validatedData['start_time'];
-        $end_time = $validatedData['end_time'];
-        $message = $validatedData['message'];
-        $booking_id = $booking->id;
+        // Cek ketersediaan
+        $conflict = Booking::where('table_id', $validated['table_id'])
+            ->where('booking_date', $validated['booking_date'])
+            ->where('id', '!=', $booking->id)
+            ->where(function ($q) use ($validated) {
+                $q->where('start_time', '<', $validated['end_time'])
+                  ->where('end_time', '>', $validated['start_time']);
+            })
+            ->exists();
 
-        try {
-            if ($table_number != $booking->table_number ||
-                $booking_date != $booking->booking_date ||
-                $start_time != Carbon::parse($booking->start_time)->format('H:i'))
-            {
-                if ($this->checkAvailability($booking_date, $table_number, $start_time, $end_time, $booking_id)) {
-                    $error = "Maaf, meja tersebut sudah dibooking pada waktu yang dipilih.";
-                }
-            }
-
-            if (empty($error)) {
-                $booking->update([
-                    'name' => $name,
-                    'email' => $email,
-                    'phone' => $phone,
-                    'table_number' => $table_number,
-                    'booking_date' => $booking_date,
-                    'start_time' => $start_time,
-                    'end_time' => $end_time,
-                    'message' => $message,
-                ]);
-
-                return redirect()->route('bookings.edit', $booking->id)
-                                 ->with('success', 'Booking berhasil diperbarui!');
-            } else {
-                return redirect()->route('bookings.edit', $booking->id)
-                                 ->withInput()
-                                 ->with('error', $error);
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->route('bookings.edit', $booking->id)
-                             ->withInput()
-                             ->with('error', "Error updating booking: " . $e->getMessage());
-        }
-    }
-
-    private function checkAvailability($date, $table, $start, $end, $exceptId = null)
-    {
-        $query = Booking::where('booking_date', $date)
-            ->where('table_number', $table)
-            ->where('start_time', '<', $end)
-            ->where('end_time', '>', $start);
-
-        if ($exceptId) {
-            $query->where('id', '!=', $exceptId);
+        if ($conflict) {
+            return back()->withInput()->with('error', 'Meja sudah dibooking pada waktu tersebut.');
         }
 
-        return $query->exists();
+        $booking->update($validated);
+
+        return redirect()->route('bookings.edit', $booking->id)->with('success', 'Booking berhasil diperbarui.');
     }
 
+    /**
+     * Hapus booking.
+     */
     public function destroy(Booking $booking)
     {
-        try {
-            $booking->delete();
-            return redirect()->route('bookings.index')->with('success', 'Booking berhasil dihapus');
-        } catch (\Exception $e) {
-            return redirect()->route('bookings.index')->with('error', 'Gagal menghapus booking: ' . $e->getMessage());
-        }
+        $booking->delete();
+        return redirect()->route('bookings.index')->with('success', 'Booking berhasil dihapus.');
     }
 }
