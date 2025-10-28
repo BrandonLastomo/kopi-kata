@@ -12,14 +12,11 @@ use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\TableController as AdminTableController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 
-Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin_users');
-Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin_users.store');
-Route::put('/admin/users/{user}', [AdminUserController::class, 'update'])->name('admin_users.update');
-Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin_users.destroy');
-
+// sign admin
 Route::get('/login_admin', [AdminUserController::class, 'loginPage'])->name('login.admin');
 Route::post('/login_admin', [AdminUserController::class, 'login'])->name('login.admin.post');
 
+// sign user
 Route::get('/register', [UserController::class, 'registerPage'])->name('register');
 Route::post('/register', [UserController::class, 'register'])->name('register.post');
 Route::get('/login', [UserController::class, 'loginPage'])->name('login');
@@ -27,26 +24,23 @@ Route::post('/login', [UserController::class, 'login'])->name('login.post');
 
 
 Route::middleware('auth')->group(function () {
+    // User pages
     Route::get('/', [HomeController::class, 'index'])->name('home');
-    // Halaman Booking (book.php)
+    // booking page
     Route::get('book', [BookingController::class, 'index'])->name('book.index');
-    
-    // Proses form booking (book.php POST)
+    // store booking
     Route::post('book', [BookingController::class, 'store'])->name('book.store');
-
-    // Hapus booking (delete_booking.php)
+    // delete booking
     Route::delete('book/{booking}', [BookingController::class, 'destroy'])->name('book.destroy');
-    
-    // Dashboard (admin_dashboard.php)
+
+    // Admin pages
+    // dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Kelola Bookings (admin_bookings.php, admin_edit_booking.php, dll)
+    // booking manage
     Route::resource('bookings', AdminBookingController::class);
-
-    // Kelola Tables (admin_tables.php)
+    // table manage
     Route::resource('tables', AdminTableController::class);
-
-    // Kelola Users (admin_users.php)
+    // user manage
     Route::resource('users', AdminUserController::class);
     
     // Logout

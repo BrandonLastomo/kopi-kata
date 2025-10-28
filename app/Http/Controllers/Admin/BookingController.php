@@ -11,11 +11,8 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    /**
-     * Tampilkan daftar booking untuk admin.
-     */
-    public function index(Request $request)
-    {
+    // booking page admin
+    public function index(Request $request) {
         $search = $request->input('search', '');
         $status_filter = $request->input('status', 'all');
         $date_from = $request->input('date_from', '');
@@ -65,22 +62,16 @@ class BookingController extends Controller
         return view('admin_bookings', compact('bookings', 'search', 'status_filter', 'date_from', 'date_to', 'sort'));
     }
 
-    /**
-     * Tampilkan form tambah booking baru.
-     */
-    public function create()
-    {
+    // add-booking page admin
+    public function create() {
         $tables = Table::all();
         $users = User::all();
 
         return view('admin_create_booking', compact('tables', 'users'));
     }
 
-    /**
-     * Simpan booking baru ke database.
-     */
-    public function store(Request $request)
-    {
+    // store inputted booking
+    public function store(Request $request) {
         $validated = $request->validate([
             'user_id' => 'nullable|exists:users,id',
             'table_id' => 'required|exists:tables,id',
@@ -90,7 +81,7 @@ class BookingController extends Controller
             'message' => 'nullable|string|max:500',
         ]);
 
-        // Validasi ketersediaan meja
+        // is table available
         $isOccupied = Booking::where('booking_date', $validated['booking_date'])
             ->where('table_id', $validated['table_id'])
             ->where(function ($q) use ($validated) {
@@ -108,20 +99,15 @@ class BookingController extends Controller
         return redirect()->route('bookings.index')->with('success', 'Booking berhasil ditambahkan.');
     }
 
-    /**
-     * Edit booking.
-     */
-    public function edit(Booking $booking)
-    {
+    // edit booking page admin
+    public function edit(Booking $booking) {
         $tables = Table::all();
         $users = User::all();
 
         return view('admin_edit_bookings', compact('booking', 'tables', 'users'));
     }
 
-    /**
-     * Update booking yang sudah ada.
-     */
+    // store edited booking
     public function update(Request $request, Booking $booking)
     {
         $validated = $request->validate([
@@ -133,7 +119,7 @@ class BookingController extends Controller
             'message' => 'nullable|string|max:500',
         ]);
 
-        // Cek ketersediaan
+        // is table available
         $conflict = Booking::where('table_id', $validated['table_id'])
             ->where('booking_date', $validated['booking_date'])
             ->where('id', '!=', $booking->id)
@@ -152,9 +138,7 @@ class BookingController extends Controller
         return redirect()->route('bookings.edit', $booking->id)->with('success', 'Booking berhasil diperbarui.');
     }
 
-    /**
-     * Hapus booking.
-     */
+    // delete booking
     public function destroy(Booking $booking)
     {
         $booking->delete();

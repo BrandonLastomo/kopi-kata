@@ -63,12 +63,11 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ]);
 
-        // Hash password sebelum disimpan
         $data['password'] = Hash::make($data['password']);
 
         User::create($data);
 
-        return redirect()->route('admin_users')->with('success', 'User baru berhasil ditambahkan');
+        return redirect()->route('users.index')->with('success', 'User baru berhasil ditambahkan');
     }
 
     public function update(Request $request, User $user)
@@ -80,7 +79,6 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ]);
 
-        // Update password jika diisi
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
@@ -90,20 +88,20 @@ class UserController extends Controller
         $user->role = $data['role'];
         $user->save();
 
-        return redirect()->route('admin_users')->with('success', 'Data user berhasil diperbarui');
+        return redirect()->route('users.index')->with('success', 'Data user berhasil diperbarui');
     }
 
     public function destroy(User $user)
     {
         if (Auth::id() === $user->id) {
-            return redirect()->route('admin_users')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return redirect()->route('users.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         try {
             $user->delete();
-            return redirect()->route('admin_users')->with('success', 'User berhasil dihapus');
+            return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
-            return redirect()->route('admin_users')->with('error', 'Gagal menghapus user: ' . $e->getMessage());
+            return redirect()->route('users.index')->with('error', 'Gagal menghapus user: ' . $e->getMessage());
         }
     }
 }

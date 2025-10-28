@@ -11,57 +11,50 @@ use Carbon\Carbon;
 
 class TableController extends Controller
 {
-    public function index(Request $request)
-{
-    // $admin_name is available from middleware
+    public function index(Request $request) {
+        // Take tables with related counts and today's booking eagerly
+        $tables = Table::orderBy('table_number')
+            ->withCount([
+                'bookings as total_bookings', // Counts all related bookings
+                'bookings as upcoming_bookings' => function ($query) {
+                    // Counts only upcoming/today bookings
+                    $query->where('booking_date', '>=', Carbon::today());
+                }
+            ])
+                ->with(['bookings' => function ($query) {
+                    $query->whereDate('booking_date', Carbon::today())
+                        ->orderBy('start_time')
+                        ->limit(1);
+                }])
+                ->get();
 
-    // Fetch tables with related counts and today's booking eagerly
-    $tables = Table::orderBy('table_number')
-        ->withCount([
-            'bookings as total_bookings', // Counts all related bookings
-            'bookings as upcoming_bookings' => function ($query) {
-                // Counts only upcoming/today bookings
-                $query->where('booking_date', '>=', Carbon::today());
+        $editMode = false;
+        $editTable = null;
+        if ($editId = $request->input('edit')) {
+            $editTable = Table::find($editId);
+            if ($editTable) {
+                $editMode = true;
             }
-        ])// --- FIX IS HERE ---
-            ->with(['bookings' => function ($query) { // Use the actual relationship name 'bookings'
-                $query->whereDate('booking_date', Carbon::today()) // Apply constraints here
-                      ->orderBy('start_time')
-                      ->limit(1); // Load only the first one for today
-            }])
-            // --- END FIX ---
-            ->get();
+        }
 
-    // $editTable logic remains the same...
-    $editMode = false; // Initialize editMode
-    $editTable = null;
-    if ($editId = $request->input('edit')) {
-         $editTable = Table::find($editId);
-         if ($editTable) {
-             $editMode = true; // Set editMode if table found
-         }
+        $selectedDate = $request->input('date', Carbon::today()->toDateString());
+        $timeslots = [
+            '10:00-12:00', '12:00-14:00', '14:00-16:00',
+            '16:00-18:00', '18:00-20:00', '20:00-22:00'
+        ];
+        $bookingsOnDate = Booking::whereDate('booking_date', $selectedDate)
+                                ->get()
+                                ->groupBy('table_number');
+
+        return view('admin_tables', compact(
+            'tables',
+            'editTable',
+            'editMode',
+            'selectedDate',
+            'timeslots',
+            'bookingsOnDate'
+        ));
     }
-
-    // $selectedDate, $timeslots, $bookingsOnDate logic remains the same...
-    $selectedDate = $request->input('date', Carbon::today()->toDateString());
-    $timeslots = [
-        '10:00-12:00', '12:00-14:00', '14:00-16:00',
-        '16:00-18:00', '18:00-20:00', '20:00-22:00'
-    ];
-    $bookingsOnDate = Booking::whereDate('booking_date', $selectedDate)
-                              ->get()
-                              ->groupBy('table_number');
-
-    // Pass the optimized data to the corrected view name
-    return view('admin_tables', compact(
-        'tables',          // Now includes _count attributes and eager-loaded relation
-        'editTable',
-        'editMode',        // Pass editMode to the view
-        'selectedDate',
-        'timeslots',
-        'bookingsOnDate'
-    ));
-}
 
     public function store(Request $request)
     {

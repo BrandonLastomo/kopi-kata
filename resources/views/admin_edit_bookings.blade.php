@@ -123,7 +123,7 @@
 
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
+        {{-- sidebar --}}
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Kopi & Kata</h2>
@@ -149,7 +149,7 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
+        {{-- main content --}}
         <main class="main-content">
             <div class="header">
                 <h1>Edit Booking</h1>
@@ -166,64 +166,64 @@
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
 
+                {{-- edit book form --}}
                 <div class="form-container">
                     <form action="{{ route('bookings.update', $booking->id) }}" method="POST">
-    @csrf
-    @method('PUT')
+                        @csrf
+                        @method('PUT')
 
-    <div class="form-group">
-        <label for="user_id">User</label>
-        <select name="user_id" id="user_id">
-            <option value="">Guest</option>
-            @foreach ($users as $user)
-                <option value="{{ $user->id }}" {{ $booking->user_id == $user->id ? 'selected' : '' }}>
-                    {{ $user->name }} ({{ $user->email }})
-                </option>
-            @endforeach
-        </select>
-    </div>
+                        <div class="form-group">
+                            <label for="user_id">User</label>
+                            <select name="user_id" id="user_id">
+                                <option value="">Guest</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}" {{ $booking->user_id == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-    <div class="form-group">
-        <label for="table_id">Meja</label>
-        <select name="table_id" id="table_id" required>
-            @foreach ($tables as $table)
-                <option value="{{ $table->id }}" {{ $booking->table_id == $table->id ? 'selected' : '' }}>
-                    Meja {{ $table->table_number }}
-                </option>
-            @endforeach
-        </select>
-    </div>
+                        <div class="form-group">
+                            <label for="table_id">Meja</label>
+                            <select name="table_id" id="table_id" required>
+                                @foreach ($tables as $table)
+                                    <option value="{{ $table->id }}" {{ $booking->table_id == $table->id ? 'selected' : '' }}>
+                                        Meja {{ $table->table_number }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-    <div class="form-group">
-        <label for="booking_date">Tanggal</label>
-        <input type="date" name="booking_date" value="{{ $booking->booking_date }}" required>
-    </div>
+                        <div class="form-group">
+                            <label for="booking_date">Tanggal</label>
+                            <input type="date" name="booking_date" value="{{ $booking->booking_date }}" required>
+                        </div>
 
-    <div class="form-group">
-        <label for="start_time">Waktu Mulai</label>
-        <input type="time" name="start_time" value="{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}" required>
-    </div>
+                        <div class="form-group">
+                            <label for="start_time">Waktu Mulai</label>
+                            <input type="time" name="start_time" value="{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}" required>
+                        </div>
 
-    <div class="form-group">
-        <label for="end_time">Waktu Selesai</label>
-        <input type="time" name="end_time" value="{{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}" required>
-    </div>
+                        <div class="form-group">
+                            <label for="end_time">Waktu Selesai</label>
+                            <input type="time" name="end_time" value="{{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}" required>
+                        </div>
 
-    <div class="form-group">
-        <label for="message">Pesan</label>
-        <textarea name="message">{{ $booking->message }}</textarea>
-    </div>
+                        <div class="form-group">
+                            <label for="message">Pesan</label>
+                            <textarea name="message">{{ $booking->message }}</textarea>
+                        </div>
 
-    <button type="submit" class="submit-btn">Perbarui Booking</button>
-</form>
-
+                        <button type="submit" class="submit-btn">Perbarui Booking</button>
+                    </form>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Validasi waktu mulai & selesai
+        // validate start and end time
         document.getElementById('start_time').addEventListener('change', function() {
             const startTime = this.value;
             const endSelect = document.getElementById('end_time');

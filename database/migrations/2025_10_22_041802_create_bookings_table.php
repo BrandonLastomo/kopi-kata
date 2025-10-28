@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->timestamps();
 
-            // Index untuk mempercepat query pencarian ketersediaan
+            // Index for performance
             $table->index(['booking_date', 'table_id']);
         });
     }

@@ -80,21 +80,21 @@
         </form>
 
         @if (request()->has('check_availability'))
-    <div id="tableSelectionSection">
-        <h1 class="heading">Choose Your Table</h1>
+        <div id="tableSelectionSection">
+            <h1 class="heading">Choose Your Table</h1>
 
-        <div class="booking-status">
-            <div class="status-item">
-                <div class="status-indicator status-available"></div>
-                <span>Available ({{ $availableTables }})</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator status-booked"></div>
-                <span>Booked ({{ $bookedTableIds->count() }})</span>
-            </div>
+            <div class="booking-status">
+                <div class="status-item">
+                    <div class="status-indicator status-available"></div>
+                    <span>Available ({{ $availableTables }})</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator status-booked"></div>
+                    <span>Booked ({{ $bookedTableIds->count() }})</span>
+                </div>
         </div>
 
-        {{-- 🪑 Table grid --}}
+        {{-- Table list --}}
         <div class="table-container">
             @foreach ($tables as $table)
                 @php
@@ -110,7 +110,7 @@
             @endforeach
         </div>
 
-        {{-- 📝 Booking form --}}
+        {{-- Booking form --}}
         <div id="bookingForm" class="hidden">
             <h1 class="heading">Isi Informasi Booking</h1>
             <form action="{{ route('book.store') }}" class="form-reserve" method="POST">
@@ -187,7 +187,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // 🕓 Validate time selection
+    // Validate time selection
     const startTimeSelect = document.getElementById('start_time');
     if (startTimeSelect) {
         startTimeSelect.addEventListener('change', function () {
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 🪑 Handle table selection
+    // Handle table selection
     @if (request()->has('check_availability'))
         const availableTables = document.querySelectorAll('.table-item.available');
         const bookingForm = document.getElementById('bookingForm');

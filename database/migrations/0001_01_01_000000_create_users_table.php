@@ -18,11 +18,10 @@ return new class extends Migration
             $table->string('password', 255);
             $table->timestamp('email_verified_at')->nullable();
             
-            // Tipe data enum yang sudah disesuaikan
             $table->enum('role', ['admin', 'user'])->default('user'); 
             
             $table->rememberToken();
-            $table->timestamps(); // created_at dan updated_at
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {

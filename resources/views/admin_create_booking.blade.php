@@ -123,7 +123,7 @@
 
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
+        {{-- sidebar --}}
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Kopi & Kata</h2>
@@ -149,7 +149,7 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
+        {{-- main content --}}
         <main class="main-content">
             <div class="header">
                 <h1>Tambah Booking</h1>
@@ -166,8 +166,8 @@
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
 
+                {{-- Add booking form --}}
                 <div class="form-container">
-                    <!-- ✅ FORM TAMBAH BOOKING -->
                     <form action="{{ route('bookings.store') }}" method="POST">
                         @csrf
 
@@ -236,7 +236,7 @@
     </div>
 
     <script>
-        // Validasi waktu mulai & selesai
+        // validate start and end time
         document.getElementById('start_time').addEventListener('change', function() {
             const startTime = this.value;
             const endSelect = document.getElementById('end_time');

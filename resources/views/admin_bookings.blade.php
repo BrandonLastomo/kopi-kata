@@ -18,7 +18,6 @@
                 <p>Admin Panel</p>
             </div>
             <nav class="sidebar-nav">
-                 {{-- Tautan diubah ke helper route() --}}
                 <div class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <a href="{{ route('dashboard') }}">Dashboard</a>
@@ -35,10 +34,6 @@
                     <i class="fas fa-users"></i>
                     <a href="{{ route('users.index') }}">Kelola Pengguna</a>
                 </div>
-                {{-- <div class="nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i>
-                    <a href="{{ route('admin.settings') }}">Pengaturan</a>
-                </div> --}}
             </nav>
         </aside>
 
@@ -46,15 +41,13 @@
             <div class="header">
                 <h1>Kelola Booking</h1>
                 <div class="admin-info">
-                    {{-- $admin_name dikirim dari middleware --}}
-                    <span>Selamat datang, {{ $admin_name ?? 'Admin' }}</span>
+                    <span>Selamat datang, {{ auth()->check() ? auth()->user()->name : "Admin" }}</span>
                         <a href="{{ route('logout') }}" class="logout-btn">
                             Logout
                         </a>
                 </div>
             </div>
 
-            {{-- Menampilkan pesan sukses/error dari session flash --}}
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
@@ -75,14 +68,9 @@
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                     <h2 style="margin: 0;">Daftar Booking</h2>
                     <div class="btn-group">
-                        {{-- Tautan diubah ke route() --}}
                         <a href="{{ route('bookings.create') }}" class="add-btn">
                             <i class="fas fa-plus"></i> Tambah Booking
                         </a>
-                        {{-- Tautan Export bisa ditambahkan nanti --}}
-                        {{-- <a href="#" class="export-btn">
-                            <i class="fas fa-file-export"></i> Export
-                        </a> --}}
                     </div>
                 </div>
 
@@ -91,7 +79,7 @@
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" name="search" placeholder="Cari nama, email, atau no. telp..."
-                                value="{{ $search }}"> {{-- Variabel dari controller --}}
+                                value="{{ $search }}">
                         </div>
                         <div class="filter-group primary-filters">
                             <select name="status">
@@ -113,10 +101,10 @@
                         <div class="date-range">
                             <span>Dari:</span>
                             <input type="date" name="date_from" class="datepicker"
-                                value="{{ $date_from }}"> {{-- Variabel dari controller --}}
+                                value="{{ $date_from }}">
                             <span>Sampai:</span>
                             <input type="date" name="date_to" class="datepicker"
-                                value="{{ $date_to }}"> {{-- Variabel dari controller --}}
+                                value="{{ $date_to }}">
                         </div>
                         <button type="button" onclick="resetFilters()">Reset Filter</button>
                     </div>
@@ -125,8 +113,7 @@
 
             <div class="content-card">
                 <div class="table-container">
-                    {{-- @if (count($bookings) > 0) --}}
-                    @if ($bookings->count() > 0) {{-- Gunakan method count() pada koleksi pagination --}}
+                    @if ($bookings->count() > 0)
                         <table>
                             <thead>
                                 <tr>
@@ -141,76 +128,72 @@
                                 </tr>
                             </thead>
                             <tbody>
-@foreach ($bookings as $booking)
-    @php
-        $bookingDate = strtotime($booking->booking_date);
-        $today = strtotime(date('Y-m-d'));
+                            @foreach ($bookings as $booking)
+                                @php
+                                    $bookingDate = strtotime($booking->booking_date);
+                                    $today = strtotime(date('Y-m-d'));
 
-        if ($bookingDate > $today) {
-            $status = 'upcoming';
-            $statusText = 'Mendatang';
-        } elseif ($bookingDate == $today) {
-            $status = 'today';
-            $statusText = 'Hari Ini';
-        } else {
-            $status = 'past';
-            $statusText = 'Lewat';
-        }
-    @endphp
-    <tr>
-        <td>{{ $loop->iteration }}</td>
-        <td>{{ $booking->user->name ?? '-' }}</td>
-        <td>{{ $booking->user->email ?? '-' }}</td>
-        <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</td>
-        <td>{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</td>
-        <td>{{ $booking->table->table_number ?? '-' }}</td>
-        <td><span class="status {{ $status }}">{{ $statusText }}</span></td>
-        <td>
-            <a href="{{ route('bookings.edit', $booking->id) }}" class="action-btn edit-btn">
-                <i class="fas fa-edit"></i>
-            </a>
-            <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" style="display:inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="action-btn delete-btn" onclick="return confirm('Hapus booking ini?')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </form>
-        </td>
-    </tr>
-@endforeach
-</tbody>
-
+                                    if ($bookingDate > $today) {
+                                        $status = 'upcoming';
+                                        $statusText = 'Mendatang';
+                                    } elseif ($bookingDate == $today) {
+                                        $status = 'today';
+                                        $statusText = 'Hari Ini';
+                                    } else {
+                                        $status = 'past';
+                                        $statusText = 'Lewat';
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $booking->user->name ?? '-' }}</td>
+                                    <td>{{ $booking->user->email ?? '-' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}</td>
+                                    <td>{{ $booking->table->table_number ?? '-' }}</td>
+                                    <td><span class="status {{ $status }}">{{ $statusText }}</span></td>
+                                    <td>
+                                        <a href="{{ route('bookings.edit', $booking->id) }}" class="action-btn edit-btn">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="action-btn delete-btn" onclick="return confirm('Hapus booking ini?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
                         </table>
 
-                        {{-- Menggunakan helper links() dari pagination Laravel --}}
                         @if ($bookings->hasPages())
                             <div class="pagination">
                                 {{ $bookings->links() }}
                             </div>
+                        @else
+                            <div class="no-data">
+                                <i class="far fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
+                                <p>Tidak ada data booking yang ditemukan.</p>
+                            </div>
                         @endif
-                    @else
-                        <div class="no-data">
-                            <i class="far fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
-                            <p>Tidak ada data booking yang ditemukan.</p>
-                        </div>
-                    @endif
                 </div>
             </div>
         </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    {{-- JS disalin langsung, dengan href diubah ke route() --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Inisialisasi date picker
+            // date picker
             flatpickr(".datepicker", {
                 dateFormat: "Y-m-d",
                 allowInput: true
             });
 
-            // Auto-submit form saat perubahan select
+            // Auto-submit form when change 
             document.querySelectorAll('select[name="status"], select[name="sort"]').forEach(function (element) {
                 element.addEventListener('change', function () {
                     document.getElementById('filterForm').submit();
@@ -220,7 +203,6 @@
 
         // Reset form filter
         function resetFilters() {
-             // Mengarahkan ke URL index tanpa parameter filter
             window.location.href = '{{ route("bookings.index") }}';
         }
     </script>

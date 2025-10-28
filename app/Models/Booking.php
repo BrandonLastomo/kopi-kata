@@ -9,9 +9,6 @@ class Booking extends Model
 {
     use HasFactory;
 
-    /**
-     * Atribut yang dapat diisi secara massal.
-     */
     protected $fillable = [
         'user_id',
         'table_id',
@@ -25,30 +22,21 @@ class Booking extends Model
         'end_time',
     ];
 
-    /**
-     * Atribut yang harus di-cast ke tipe data tertentu.
-     */
     protected $casts = [
         'booking_date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
     ];
 
-    /**
-     * Relasi: Mendapatkan data meja yang dibooking.
-     */
+    // get booked table
     public function table()
     {
-        // Relasi berdasarkan table_number
         return $this->belongsTo(Table::class);
     }
 
-    /**
-     * Relasi: Mendapatkan data user (jika ada) yang terkait dengan email booking.
-     */
+    // get user who booked
     public function user()
     {
-        // Relasi berdasarkan email
         return $this->belongsTo(User::class);
     }
 }

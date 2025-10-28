@@ -9,9 +9,6 @@ class Table extends Model
 {
     use HasFactory;
     
-    /**
-     * Atribut yang dapat diisi secara massal.
-     */
     protected $fillable = [
         'table_number',
         'capacity',
@@ -20,12 +17,9 @@ class Table extends Model
         'description',
     ];
 
-    /**
-     * Relasi: Mendapatkan semua booking untuk meja ini.
-     */
+    // relation with booking table
     public function bookings()
     {
-        // Relasi berdasarkan table_number
         return $this->hasMany(Booking::class);
     }
 }

@@ -33,10 +33,6 @@
                     <i class="fas fa-users"></i>
                     <a href="{{ route('users.index') }}">Kelola Pengguna</a>
                 </div>
-                {{-- <div class="nav-item {{ request()->routeIs('settings') ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i>
-                    <a href="{{ route('settings') }}">Pengaturan</a>
-                </div> --}}
             </nav>
         </aside>
 
@@ -45,14 +41,12 @@
                 <h1>Kelola Meja</h1>
                 <div class="admin-info">
                     <span>Selamat datang, {{ $admin_name ?? 'Admin' }}</span>
-                    {{-- Tombol Logout diubah menjadi form --}}
                         <a href="{{ route('logout') }}" class="logout-btn">
                             Logout
                         </a>
                 </div>
             </div>
 
-            {{-- Menampilkan pesan sukses/error dari session flash --}}
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
@@ -71,7 +65,7 @@
 
             <div class="tab-container">
                 @php
-                    // Logika untuk menentukan tab aktif
+                    // active tab
                     $tab = request('tab', $editMode ? 'add' : 'list');
                 @endphp
                 <div class="tabs">
@@ -123,7 +117,6 @@
                                     </div>
 
                                     @if ($table->bookings->isNotEmpty())
-                                        {{-- Get the first (and only) booking from that collection --}}
                                         @php $today_booking = $table->bookings->first(); @endphp
                                         <div class="table-booking-info">
                                             <strong>Booking Hari Ini:</strong>
@@ -209,8 +202,6 @@
                                     name="description">{{ old('description', $editTable->description ?? '') }}</textarea>
                             </div>
 
-                            {{-- Input 'action' dan 'id' tidak lagi diperlukan --}}
-
                             <button type="submit" class="btn-primary">
                                 <i class="fas fa-save"></i> {{ $editMode ? 'Update Meja' : 'Tambah Meja' }}
                             </button>
@@ -251,7 +242,6 @@
                                                 $isBooked = false;
                                                 $bookedBy = '';
 
-                                                // Logika cek booking yang sudah dioptimasi
                                                 if (isset($bookingsOnDate[$table->table_number])) {
                                                     foreach ($bookingsOnDate[$table->table_number] as $booking) {
                                                         if (($booking->start_time < $endTime) && ($booking->end_time > $startTime)) {
@@ -290,17 +280,13 @@
         </main>
     </div>
 
-    {{-- JS disalin langsung, dengan href diubah ke route() --}}
     <script>
-        // Fungsi ini tidak lagi digunakan oleh form, tapi mungkin oleh JS lain
         function confirmDelete(id) {
             if (confirm('Apakah Anda yakin ingin menghapus meja ini? Semua booking terkait akan dihapus juga.')) {
-                // Logika form submit akan menangani ini
             }
         }
 
         function switchTab(tabId) {
-            // Menggunakan URL::route() untuk membuat URL dengan parameter
             window.location.href = '{{ route('tables.index') }}?tab=' + tabId;
         }
     </script>
