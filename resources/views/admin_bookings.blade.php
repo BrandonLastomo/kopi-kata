@@ -173,6 +173,7 @@
                             <div class="pagination">
                                 {{ $bookings->links() }}
                             </div>
+                        @endif
                         @else
                             <div class="no-data">
                                 <i class="far fa-calendar-times" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
